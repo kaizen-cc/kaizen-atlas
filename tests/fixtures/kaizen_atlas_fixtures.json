@@ -1,0 +1,321 @@
+{
+ "_meta": {
+  "purpose": "Validated assertion targets for Kaizen Atlas revenue engine",
+  "period": "2026-01 to 2026-05",
+  "basis": "Stripe paid invoices created-in-month; MRR=subscription line items, one-off=manual; 'Ad Spend Reimbursement' excluded as pass-through; off-Stripe rescue clients NOT included in these Stripe figures (add separately)"
+ },
+ "mrr_by_team_month_stripe": {
+  "Meta": {
+   "jan": 51800,
+   "feb": 56625,
+   "mar": 53850,
+   "apr": 49875,
+   "may": 46825
+  },
+  "Email": {
+   "jan": 13875,
+   "feb": 17875,
+   "mar": 18750,
+   "apr": 26550,
+   "may": 23050
+  },
+  "Google": {
+   "jan": 24950,
+   "feb": 27025,
+   "mar": 22575,
+   "apr": 21525,
+   "may": 20400
+  },
+  "Social": {
+   "jan": 11800,
+   "feb": 11800,
+   "mar": 9200,
+   "apr": 12000,
+   "may": 13750
+  },
+  "Web": {
+   "jan": 6750,
+   "feb": 6500,
+   "mar": 5500,
+   "apr": 5500,
+   "may": 6500
+  },
+  "Creative": {
+   "jan": 2000,
+   "feb": 3500,
+   "mar": 3000,
+   "apr": 3500,
+   "may": 4000
+  },
+  "SEO": {
+   "jan": 1500,
+   "feb": 1000,
+   "mar": 1000,
+   "apr": 1000,
+   "may": 1000
+  },
+  "GHL": {
+   "jan": 0,
+   "feb": 0,
+   "mar": 625,
+   "apr": 625,
+   "may": 625
+  }
+ },
+ "oneoff_total_by_month_stripe": {
+  "jan": 24050,
+  "feb": 17900,
+  "mar": 34650,
+  "apr": 21250,
+  "may": 11325
+ },
+ "company_mrr_total_stripe": {
+  "jan": 112675,
+  "feb": 124325,
+  "mar": 114500,
+  "apr": 120575,
+  "may": 116150
+ },
+ "off_stripe_rescue_clients": {
+  "Tejas Brewery": {
+   "Social": 750,
+   "Email": 750,
+   "Google": 875,
+   "Meta": 875,
+   "total": 3250
+  },
+  "Giant Texas": {
+   "Google": 875,
+   "Meta": 875,
+   "Social": 750,
+   "total": 2500
+  },
+  "Tejas Beer": {
+   "Social": 600,
+   "total": 600
+  },
+  "Oceanbox": {
+   "Email": 2500,
+   "total": 2500,
+   "note": "split assumed; confirm from Stripe invoice"
+  },
+  "_note": "Pay by check/ACH, sit past-due in Stripe. Crust and Holland also pay by check but ARE marked paid in Stripe, so they appear in normal paid pulls; do NOT double count them via the rescue list."
+ },
+ "per_team_may": {
+  "Meta": {
+   "mrr": 48575,
+   "labor": 13768,
+   "software": 1198,
+   "labor_note": "media buyers only"
+  },
+  "Email": {
+   "mrr": 26300,
+   "labor": 10437,
+   "software": 685,
+   "note": "incl Oceanbox $2,500 (assumed)"
+  },
+  "Google": {
+   "mrr": 22150,
+   "labor": 4504,
+   "software": 360
+  },
+  "Social": {
+   "mrr": 15850,
+   "labor": 4941,
+   "software": 50
+  },
+  "Web": {
+   "mrr": 6500,
+   "labor": 11087,
+   "software": 373,
+   "note": "negative on MRR; real product is one-off builds"
+  },
+  "Creative": {
+   "mrr": 4000,
+   "labor": 7982,
+   "software": 888,
+   "labor_note": "designers+video 7622 + photographers 360 (Quiroz, Xero contractor)"
+  },
+  "SEO": {
+   "mrr": 1000,
+   "labor": null,
+   "software": 202,
+   "note": "no dedicated staff; labor embedded in Google"
+  },
+  "GHL": {
+   "mrr": 625,
+   "labor": 2628,
+   "software": 136,
+   "labor_note": "Clare; Kennedy ramping, add from Gusto"
+  }
+ },
+ "software_breakdown_monthly": {
+  "Meta": [
+   [
+    "Deal.ai",
+    124
+   ],
+   [
+    "Motion (50%)",
+    404
+   ],
+   [
+    "Supermetrics (50%)",
+    222
+   ],
+   [
+    "Claude+Slack 9 seats",
+    448
+   ]
+  ],
+  "Email": [
+   [
+    "Figma",
+    302
+   ],
+   [
+    "EmailLove",
+    35
+   ],
+   [
+    "Claude+Slack 7 seats",
+    348
+   ]
+  ],
+  "Google": [
+   [
+    "Spyfu",
+    39
+   ],
+   [
+    "Supermetrics (50%)",
+    222
+   ],
+   [
+    "Claude+Slack 2 seats",
+    99
+   ]
+  ],
+  "Social": [
+   [
+    "Claude+Slack 1 seat",
+    50
+   ]
+  ],
+  "Web": [
+   [
+    "Hosting GoDaddy/Hostinger/WP",
+    224
+   ],
+   [
+    "Claude+Slack 3 seats",
+    149
+   ]
+  ],
+  "Creative": [
+   [
+    "Motion (50%)",
+    404
+   ],
+   [
+    "Design Adobe/Canva/stock",
+    184
+   ],
+   [
+    "AI media Arcads/Higgsfield/+3",
+    151
+   ],
+   [
+    "Claude+Slack 3 seats",
+    149
+   ]
+  ],
+  "SEO": [
+   [
+    "Conversion / Seona.ai",
+    195
+   ],
+   [
+    "Bulls Eye Media",
+    7
+   ]
+  ],
+  "GHL": [
+   [
+    "GoHighLevel",
+    136
+   ]
+  ]
+ },
+ "software_notes": {
+  "seat_rate": "$49.75/seat/mo, Claude+Slack across 29 seats",
+  "company_level": "Operations ~$2,707, Sales/outreach ~$1,216, Misc ~$96",
+  "one_time_excluded": "Diiiploy $6,666 (OS build) excluded from run-rate",
+  "reclassed": "Remitly to labor; Klaviyo nets negative (reimbursements+referral income)"
+ },
+ "company_totals": {
+  "atlas_monthly_revenue": {
+   "jan": 124700,
+   "feb": 134253,
+   "mar": 149275,
+   "apr": 144250,
+   "may": 139425
+  },
+  "atlas_monthly_net_profit": {
+   "apr": 38788,
+   "may": 33034
+  },
+  "may": {
+   "revenue_xero": 139425,
+   "recognized_revenue_stripe": 136325,
+   "net_profit": 33034,
+   "margin_pct": 23.7,
+   "residual": 3100
+  },
+  "reconciliation_note": "Monthly cash does NOT tie cleanly to Atlas across months: one-off is lumpy (Mar $37,650 vs May $11,325) and checks bunch. MRR by period is the stable decision metric; cash is the secondary lens."
+ },
+ "cost_factors_PLACEHOLDER": {
+  "Meta": 0.31,
+  "Email": 0.42,
+  "Google": 0.22,
+  "Social": 0.32,
+  "Web": 0.55,
+  "Creative": 0.6,
+  "GHL": 0.5,
+  "SEO": 0.25,
+  "Other": 0.35,
+  "_warning": "MODELED placeholders for per-client cost ONLY, until Toggl provides real hours per client. Replace with Toggl-derived costs; do NOT ship as real."
+ },
+ "xero_cost_increase_may_vs_apr": [
+  {
+   "cat": "Contractors",
+   "apr": 47110,
+   "may": 51906,
+   "incr": 4796
+  },
+  {
+   "cat": "Meals",
+   "apr": 0,
+   "may": 816,
+   "incr": 816
+  },
+  {
+   "cat": "Softwares",
+   "apr": 7537,
+   "may": 8057,
+   "incr": 520
+  },
+  {
+   "cat": "Bank Service Charges",
+   "apr": 0,
+   "may": 400,
+   "incr": 400
+  },
+  {
+   "cat": "Car & Truck",
+   "apr": 0,
+   "may": 170,
+   "incr": 170
+  }
+ ]
+}

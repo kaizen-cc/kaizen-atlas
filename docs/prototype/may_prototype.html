@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kaizen atlas · May 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+:root{--red:#D93B47;--red-dk:#F07880;--red-wash:rgba(217,59,71,.14);--grn:#5ED6A8;--ink:#F2F2F2;--bg:#0A0A0B;--panel:#141416;--panel-2:#1B1B1F;--line:#26262B;--line-2:#34343B;--muted:#9A9AA2;--faint:#67676F;--disp:'Familjen Grotesk','Poppins',sans-serif;--body:'Poppins',sans-serif;--r:5px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;line-height:1.5}
+.num{font-family:var(--disp);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+header{padding:26px 0 16px}
+.brandrow{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.wordmark{font-family:var(--disp);font-weight:700;font-size:27px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.kmark{width:30px;height:30px;background:var(--red);border-radius:var(--r);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px}
+.wordmark .atlas{color:var(--red)}
+.kicker{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.monthtag{font-family:var(--disp);font-size:12px;font-weight:500;border:1px solid var(--line-2);border-radius:var(--r);padding:6px 13px;background:var(--panel)}
+.redrule{height:3px;background:var(--red);border-radius:2px;margin:16px 0 0;width:64px}
+.note{margin-top:14px;font-size:12.5px;color:var(--muted);max-width:820px}.note b{color:var(--ink);font-weight:600}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:13px}
+.badge{font-family:var(--disp);font-size:10px;letter-spacing:.06em;padding:2px 7px;border-radius:4px;text-transform:uppercase;font-weight:600}
+.b-stripe{background:var(--red-wash);color:var(--red-dk)}.b-key{background:var(--ink);color:#0A0A0B}.b-atlas{background:#3A2E18;color:#E0A53C}.b-cpa{background:var(--panel);color:var(--muted);border:1px solid var(--line-2)}.b-model{background:#2A2233;color:#C79BE0}
+.legend .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+nav{display:flex;gap:2px;margin:22px 0 0;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+.tab{font-family:var(--disp);font-weight:600;font-size:14px;color:var(--muted);background:none;border:none;padding:11px 15px;cursor:pointer;border-bottom:2px solid transparent}
+.tab:hover{color:var(--ink)}.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
+.tab:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:3px}
+.panel{display:none;padding-top:26px}.panel.active{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel.active{animation:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.lbl{font-family:var(--disp);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.histbanner{background:var(--panel-2);border:1px solid var(--line-2);border-left:3px solid var(--red);border-radius:var(--r);padding:10px 14px;font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 15px}
+.metric .ml{font-family:var(--disp);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);min-height:26px}
+.metric .mv{font-family:var(--disp);font-weight:700;font-size:25px;letter-spacing:-.02em;margin:8px 0 2px}
+.metric .mv.pend{font-size:13px;font-weight:500;color:var(--faint);font-family:var(--body)}
+.metric .msrc{font-size:10px;color:var(--faint);margin-bottom:9px}
+.delta{display:flex;gap:6px}
+.dchip{font-family:var(--disp);font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--panel-2);color:var(--faint);border:1px solid var(--line)}
+.dchip.down{background:var(--red-wash);color:var(--red-dk);border-color:transparent}
+.dchip.up{background:rgba(94,214,168,.14);color:var(--grn);border-color:transparent}
+.split{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:118px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px}
+.chip .who{font-size:12px;color:var(--muted);font-weight:500}.chip .amt{font-family:var(--disp);font-size:19px;font-weight:700;margin-top:3px}
+.recon .row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.recon .row:last-child{border-bottom:none}.recon .row .v{font-family:var(--disp);font-weight:600;font-size:15px}
+.recon .row.tot .v{color:var(--red-dk);font-weight:700}.recon .row.res .v{color:var(--muted)}.recon .row span:first-child{font-size:13.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tp .big{font-family:var(--disp);font-weight:700;font-size:46px;letter-spacing:-.03em;line-height:1;margin:12px 0 8px}
+.tp .big::after{content:"";display:block;width:48px;height:4px;background:var(--red);border-radius:2px;margin-top:12px}
+table{width:100%;border-collapse:collapse}
+thead th{font-family:var(--disp);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);text-align:right;padding:0 14px 11px;font-weight:600}
+thead th:first-child{text-align:left}
+tbody td{padding:13px 14px;border-top:1px solid var(--line);text-align:right;font-family:var(--disp);font-size:14px;font-variant-numeric:tabular-nums;font-weight:500}
+tbody td:first-child{text-align:left;font-family:var(--body);font-weight:600;font-size:14px}
+tbody tr:hover{background:var(--panel-2)}
+td.hcell{cursor:help}td.hcell span.u{border-bottom:1px dotted var(--line-2)}
+.team-tag{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:10px;vertical-align:middle}
+.pending{color:var(--faint);font-weight:400}
+.mm{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.meter{width:74px;height:8px;background:var(--line-2);border-radius:5px;overflow:hidden;display:inline-block}
+.meter i{display:block;height:100%;background:var(--red);border-radius:5px}.pct{font-weight:700}
+h2.sec{font-family:var(--disp);font-weight:600;font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seclead{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.cli-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.cli-count{font-family:var(--disp);font-size:12px;color:var(--muted)}
+.clirow{display:grid;grid-template-columns:1.7fr .9fr .9fr .9fr .8fr;gap:10px;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.clirow.head{border-top:none;font-family:var(--disp);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.clirow .cn{font-weight:600;font-size:13.5px}.clirow .v{font-family:var(--disp);text-align:right;font-size:13px;font-variant-numeric:tabular-nums;font-weight:500}
+.clirow .v.cost{color:var(--red-dk);cursor:help;border-bottom:1px dotted var(--line-2)}.clirow.crow:hover{background:var(--panel-2)}.mpct{font-weight:700}
+.off-tag{font-family:var(--disp);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--red-dk);background:var(--red-wash);padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:600}
+.rank{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.rank:last-child{border-bottom:none}.rank.rrow{cursor:help}.rank.rrow:hover{background:var(--panel-2)}.rank .rn{font-weight:600;display:flex;align-items:center;gap:9px}.rank .ri{font-family:var(--disp);font-size:11px;color:var(--faint);width:16px}
+.rank .rv{font-family:var(--disp);font-weight:700;font-variant-numeric:tabular-nums}.rank .rv.good{color:var(--grn)}.rank .rv.bad{color:var(--red-dk)}
+.tcrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:help}
+.tcrow:last-child{border-bottom:none}.tcrow:hover{background:var(--panel-2)}.tcrow .tn{font-weight:600;display:flex;align-items:center;gap:9px}
+.tcrow .tv{font-family:var(--disp);font-weight:600;font-variant-numeric:tabular-nums;border-bottom:1px dotted var(--line-2)}
+.emprow{display:grid;grid-template-columns:1.4fr 1.6fr 1fr;gap:10px;padding:10px 14px;border-top:1px solid var(--line);align-items:center;font-size:13.5px}
+.emprow.head{border-top:none;font-family:var(--disp);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.emprow .en{font-weight:600}.emprow .et{color:var(--muted);display:flex;align-items:center;gap:8px}.emprow .er{font-family:var(--disp);text-align:right;font-variant-numeric:tabular-nums}
+.pill{font-family:var(--disp);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:4px;font-weight:600}
+.pill.s{background:var(--red-wash);color:var(--red-dk)}.pill.h{background:var(--panel-2);color:var(--muted);border:1px solid var(--line-2)}.pill.c{background:#2A2233;color:#C79BE0}
+.callout{background:var(--red-wash);border:1px solid rgba(217,59,71,.3);border-radius:var(--r);padding:13px 15px;font-size:13px;color:var(--red-dk);margin-top:14px}.callout b{color:var(--red-dk)}
+/* projection */
+.samplebanner{background:#221A2B;border:1px solid #3A2D49;border-left:3px solid #C79BE0;border-radius:var(--r);padding:10px 14px;font-size:12.5px;color:#C79BE0;margin-bottom:14px}
+.projhero{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.projhero .big{font-family:var(--disp);font-weight:700;font-size:48px;letter-spacing:-.03em;line-height:1;margin:10px 0 6px}
+.pbar{height:12px;background:var(--line-2);border-radius:6px;overflow:hidden;margin:14px 0 6px;position:relative}
+.pbar i{display:block;height:100%;background:var(--red);border-radius:6px}
+.pbar b{position:absolute;top:0;height:100%;width:2px;background:var(--ink);opacity:.5}
+.ptiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.ptile{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:13px}
+.ptile .pl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-family:var(--disp)}
+.ptile .pv{font-family:var(--disp);font-weight:700;font-size:20px;margin-top:5px}
+.ptile .pd{font-size:11px;margin-top:3px}
+.chart{display:flex;align-items:flex-end;gap:12px;height:150px;margin-top:18px;padding-top:10px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
+.bar .bv{font-family:var(--disp);font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar .bb{width:100%;background:var(--line-2);border-radius:4px 4px 0 0;min-height:3px}
+.bar.proj .bb{background:repeating-linear-gradient(45deg,var(--red),var(--red) 5px,#9e2b34 5px,#9e2b34 10px)}
+.bar.cur .bb{background:var(--red)}
+.bar .bm{font-family:var(--disp);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+.up{color:var(--grn)}.down{color:var(--red-dk)}
+#hover{position:fixed;z-index:50;display:none;width:296px;background:#101013;border:1px solid var(--line-2);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.6);padding:14px;pointer-events:none}
+#hover .ht{font-family:var(--disp);font-weight:700;font-size:14px;margin-bottom:2px}
+#hover .hsub{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+#hover .hrow{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+#hover .hrow .ht2{display:flex;align-items:center;gap:7px}#hover .hrow .hv{font-family:var(--disp);font-variant-numeric:tabular-nums;font-weight:600}
+#hover .hcost{color:var(--red-dk)}#hover .hdrv{margin-top:10px;font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+#hover .demp{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);padding:3px 0}#hover .demp .dn{color:var(--ink)}
+#hover .hmodel{margin-top:10px;font-size:10.5px;color:#C79BE0;background:#2A2233;border-radius:4px;padding:6px 8px}
+#hover .hreal{margin-top:10px;font-size:10.5px;color:var(--grn);background:rgba(94,214,168,.12);border-radius:4px;padding:6px 8px}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.two,.projhero{grid-template-columns:1fr}.clirow{grid-template-columns:1.4fr 1fr 1fr}.clirow .h{display:none}.emprow{grid-template-columns:1.3fr 1fr}.emprow .et{display:none}.ptiles{grid-template-columns:1fr}thead{display:none}tbody td{padding:9px 10px;font-size:13px}#hover{display:none!important}.chart .bv{display:none}}
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="brandrow"><div><div class="kicker">the 1% agency · live P&amp;L</div>
+    <div class="wordmark"><span class="kmark">力</span>kaizen <span class="atlas">atlas</span></div></div>
+    <div class="monthtag">May 2026 · prototype snapshot</div></div>
+  <div class="redrule"></div>
+  <p class="note"><b>Prototype on May data.</b> Revenue and software are validated against Stripe and the allocation key; software hovers show real products. Labor and the per-client cost, rankings, and labor hovers are <b>modeled</b> until Toggl supplies hours. Total revenue and total profit compare to last month from your Atlas. MRR-level comparisons and subscriber lifetime activate with more history. The projection tab shows <b>sample</b> data.</p>
+  <div class="legend">
+    <span class="lg"><span class="badge b-stripe">Stripe</span> revenue</span>
+    <span class="lg"><span class="badge b-cpa">Xero</span> source of truth</span>
+    <span class="lg"><span class="badge b-key">Key</span> software</span>
+    <span class="lg"><span class="badge b-atlas">Atlas</span> labor</span>
+    <span class="lg"><span class="badge b-model">Model</span> Toggl pending</span></div>
+</header>
+<nav role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="health">Company Health</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="team">Per Team</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="client">Per Client</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="emp">Employees</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="pulse">Pulse</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="proj">Projection</button>
+</nav>
+
+<section class="panel active" id="health" role="tabpanel">
+  <div class="histbanner">Total revenue and total profit compare to last month using your Atlas figures. MRR, average ticket, and subscriber lifetime comparisons fill in once prior-month detail and last year load.</div>
+  <div class="metrics">
+    <div class="metric"><div class="ml">Total revenue</div><div class="mv num">$139,425</div><div class="msrc">Xero · source of truth</div><div class="delta"><span class="dchip down">MoM −3.3%</span><span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Total MRR</div><div class="mv num">$125,000</div><div class="msrc">active subscriptions</div><div class="delta"><span class="dchip">MoM —</span><span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Avg ticket value</div><div class="mv num">$1736</div><div class="msrc">MRR per subscriber (72)</div><div class="delta"><span class="dchip">MoM —</span><span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Avg subscriber lifetime</div><div class="mv pend">loads from<br>Stripe history</div><div class="msrc">avg active subscription length</div><div class="delta"><span class="dchip">MoM —</span><span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Company margin</div><div class="mv num">23.7%</div><div class="msrc">net on revenue</div><div class="delta"><span class="dchip down">MoM −3.2pts</span><span class="dchip">YoY —</span></div></div>
+  </div>
+  <div class="two" style="margin-top:14px">
+    <div class="card tp"><div class="lbl">Total profit · May <span class="badge b-cpa">Xero</span></div>
+      <div class="big num">$33,034</div>
+      <div class="delta"><span class="dchip down">vs last month −14.8%</span><span class="dchip">vs last year —</span></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px">April was $38,788. The dip tracks May's softer revenue ($139,425 vs $144,250) against steady cost.</p></div>
+    <div class="card"><div class="lbl">Revenue, two lenses</div>
+      <div style="display:flex;height:14px;border-radius:var(--r);overflow:hidden;margin:14px 0 8px;border:1px solid var(--line)"><i style="width:91.7%;background:var(--red)"></i><i style="width:8.3%;background:var(--ink)"></i></div>
+      <div style="display:flex;gap:18px;font-size:12px;color:var(--muted)"><span><span class="team-tag" style="background:var(--red)"></span>MRR 91.7%</span><span><span class="team-tag" style="background:var(--ink)"></span>One-off 8.3%</span></div>
+      <div class="recon" style="margin-top:12px">
+        <div class="row"><span>Recognized revenue <span class="badge b-stripe">Stripe</span></span><span class="v num">$136,325</span></div>
+        <div class="row"><span>Cash collected <span class="badge b-cpa">Xero</span></span><span class="v num">$139,425</span></div>
+        <div class="row res"><span>Residual to reconcile</span><span class="v num">$3,100</span></div></div></div>
+  </div>
+</section>
+
+<section class="panel" id="team" role="tabpanel">
+  <h2 class="sec">Per-team contribution margin <span class="badge b-stripe">Stripe</span> <span class="badge b-atlas">Atlas</span> <span class="badge b-key">Key</span></h2>
+  <p class="seclead">MRR minus labor minus allocated software. Hover MRR for the top clients on that service, Labor for the employee breakdown, and Software for the products attributed to each team.</p>
+  <div class="card"><table><thead><tr><th>Team</th><th>MRR</th><th>Labor</th><th>Software</th><th>Margin $</th><th>Margin %</th></tr></thead><tbody id="teambody"></tbody></table></div>
+  <div class="callout" style="margin-top:14px"><b>Creative, GHL, and Web read negative on recurring revenue alone.</b> Creative output is mostly ad creative for Meta, GHL automation is built into client retainers, and Web's real product is one-off builds. Their cost sits here while the revenue lands elsewhere. SEO labor is embedded in the Google team.</div>
+</section>
+
+<section class="panel" id="client" role="tabpanel">
+  <h2 class="sec">Every client, margin ranked <span class="badge b-stripe">Stripe</span> <span class="badge b-model">Model</span></h2>
+  <p class="seclead">Sorted lowest margin first, so the clients to worry about sit at the top. Revenue is real from Stripe. Hover a client's cost for the team and employee breakdown. Cost and margin are modeled until Toggl supplies hours per client.</p>
+  <div class="card" style="padding:14px 6px"><div class="cli-meta" style="padding:0 14px"><span class="cli-count" id="clicount"></span><span class="cli-count">lowest margin first · hover cost for breakdown</span></div>
+    <div class="clirow head"><div>Client</div><div class="v">Revenue</div><div class="v cost" style="border:none;cursor:default">Cost</div><div class="v">Margin</div><div class="v">Margin %</div></div>
+    <div id="clibody"></div></div>
+</section>
+
+<section class="panel" id="emp" role="tabpanel">
+  <h2 class="sec">Employees and pay <span class="badge b-atlas">Roster</span></h2>
+  <p class="seclead">Current team after the roster cleanup. Salaried fixed monthly; hourly from Gusto times Toggl hours. Photographers bill per shoot through Xero.</p>
+  <div class="card" style="padding:14px 6px"><div class="emprow head"><div>Name</div><div>Team</div><div class="er">Rate</div></div><div id="empbody"></div></div>
+</section>
+
+<section class="panel" id="pulse" role="tabpanel">
+  <div class="two">
+    <div class="card"><div class="lbl">Top 5 most profitable clients <span class="badge b-model">Model</span></div><div id="topgood" style="margin-top:10px"></div></div>
+    <div class="card"><div class="lbl">Top 5 least profitable clients <span class="badge b-model">Model</span></div><div id="topbad" style="margin-top:10px"></div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="lbl">Service-line cost <span class="badge b-atlas">Atlas</span> <span class="badge b-key">Key</span></div>
+    <p class="seclead" style="margin:8px 0 6px">Ranked by total cost this month. The month-over-month increase lights up once prior months load. Hover any line for the employee breakdown driving it.</p>
+    <div id="teamcost"></div></div>
+  <div class="card" style="margin-top:14px"><div class="lbl">Biggest cost increases vs last month <span class="badge b-cpa">Xero</span></div>
+    <p class="seclead" style="margin:8px 0 6px">The five expense categories that rose most from April to May. Hover any line for the transactions behind it.</p>
+    <div id="xeroincr"></div></div>
+</section>
+
+<section class="panel" id="proj" role="tabpanel">
+  <div class="samplebanner">Sample data, shown so you can shape the layout. The history bars (Jan to May) are your real Atlas revenue; the June projection and the comparison figures are illustrative until prior-month MRR and pacing load.</div>
+  <div class="projhero">
+    <div class="card"><div class="lbl">Projected June revenue <span class="badge b-model">Sample</span></div>
+      <div class="big num">$146,800</div>
+      <div class="delta"><span class="dchip up">pace +5.3% vs May</span></div>
+      <div class="pbar" id="pbar"><i style="width:64%"></i><b style="left:64%"></b></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>Collected to date $93,900</span><span>64% of projection</span></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">Contracted MRR covers most of the remainder; the swing is one-off build work still to close.</p></div>
+    <div class="card"><div class="lbl">Pulse on the month <span class="badge b-model">Sample</span></div>
+      <div class="ptiles" style="grid-template-columns:1fr">
+        <div class="ptile"><div class="pl">MRR vs last month</div><div class="pv num">$125,000</div><div class="pd up">+2.1% from April</div></div>
+        <div class="ptile"><div class="pl">Avg ticket vs last month</div><div class="pv num">$1,736</div><div class="pd down">−1.4% from April</div></div>
+        <div class="ptile"><div class="pl">Contracted MRR remaining</div><div class="pv num">$31,250</div><div class="pd" style="color:var(--muted)">already on the books for June</div></div>
+      </div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="lbl">Revenue trend, six months <span class="badge b-atlas">Atlas</span> <span class="badge b-model">Sample</span></div>
+    <div class="chart" id="chart"></div></div>
+</section>
+</div>
+<div id="hover"></div>
+<script>
+const teams=[{"n": "Meta", "c": "#D93B47", "mrr": 48575, "lab": 13768, "sw": 1198}, {"n": "Email", "c": "#F2F2F2", "mrr": 26300, "lab": 10437, "sw": 685}, {"n": "Google", "c": "#E8857F", "mrr": 22150, "lab": 4504, "sw": 360}, {"n": "Social", "c": "#9A9AA2", "mrr": 15850, "lab": 4941, "sw": 50}, {"n": "Web", "c": "#A82430", "mrr": 6500, "lab": 11087, "sw": 373}, {"n": "Creative", "c": "#CC6666", "mrr": 4000, "lab": 7982, "sw": 888}, {"n": "SEO", "c": "#6E6E76", "mrr": 1000, "lab": null, "sw": 202}, {"n": "GHL", "c": "#5A5A60", "mrr": 625, "lab": 2628, "sw": 136}],roster=[["Meta", "Mark A.", "$3,500 / mo", "salary"], ["Meta", "Dipesh", "$4,000 / mo", "salary"], ["Meta", "Thomas", "$15 / hr", "hourly"], ["Meta", "Gustavo Fonseca", "$12 then $15 / hr", "hourly"], ["Meta", "Eduarda Telechi", "$15 / hr", "hourly"], ["Meta", "Arthur R\u00fcckert", "$15 / hr", "hourly"], ["Meta", "Priscila", "$10 / hr", "hourly"], ["Meta", "Camille (copy)", "$6 / hr", "hourly"], ["Creative", "Nelson", "$15 / hr", "hourly"], ["Creative", "Hillary", "$12 / hr", "hourly"], ["Creative", "Jazem", "$15.50 / hr", "hourly"], ["Creative", "Teuta", "$25 / hr", "hourly"], ["Creative", "Mira Dubovets", "$12 then $15 / hr", "hourly"], ["Creative", "Daniel Alvarez", "$10 then $12 / hr", "hourly"], ["Creative", "Jonathan Quiroz (photo)", "per shoot \u00b7 Xero", "contractor"], ["Creative", "Tanner Walsh (photo)", "per shoot \u00b7 Xero", "contractor"], ["Google", "Sultan", "$15 / hr", "hourly"], ["Google", "Aneesa", "$8 / hr", "hourly"], ["Google", "Salman", "$10 / hr", "hourly"], ["Social", "Peter", "$19 / hr", "hourly"], ["Social", "Camila", "$15 / hr", "hourly"], ["Email", "Mel", "$4,500 / mo", "salary"], ["Email", "Eunhye", "$25 / hr", "hourly"], ["Email", "Adriana", "$15 / hr", "hourly"], ["Email", "Andres", "$6.50 / hr", "hourly"], ["Email", "Dani Beltran", "$15 / hr", "hourly"], ["Email", "Niro Sivarajah", "$10 then $12 / hr", "hourly"], ["Email", "Facundo Marina", "$12 then $15 / hr", "hourly"], ["Email", "Lawrence Samuel", "$10 then $12 / hr", "hourly"], ["Email", "Renato Rojas", "$10 then $12 / hr", "hourly"], ["Email", "Fernando Conde", "$19 / hr", "hourly"], ["Web", "Jesus", "$2,500 / mo", "salary"], ["Web", "Lubin", "$20 / hr", "hourly"], ["Web", "Andrew", "$10 / hr", "hourly"], ["Web", "Francisco", "$15 / hr", "hourly"], ["Web", "Andres G.", "$10 / hr", "hourly"], ["GHL", "Clare", "$25 / hr", "hourly"], ["GHL", "Kennedy Juma", "$10 then $12 / hr", "hourly"], ["Operations", "Fabi", "$2,250 / mo", "salary"], ["Operations", "Jorgi", "$13.50 / hr", "hourly"]],clients=[{"n": "RE Creative Agency", "rev": 7750, "teams": {"Email": 2250, "Meta": 3750, "Web": 1000, "Google": 750}}, {"n": "Lux Marketing Company", "rev": 6000, "teams": {"Google": 2250, "Meta": 3750}}, {"n": "Kore Outdoor", "rev": 5000, "teams": {"Meta": 1750, "Email": 1750, "Web": 1500}}, {"n": "4Throws", "rev": 4750, "teams": {"Google": 1000, "Meta": 1000, "Creative": 1000, "Email": 1750}}, {"n": "Kattya Hernandez", "rev": 4350, "teams": {"Social": 1850, "Email": 750, "Google": 875, "Meta": 875}}, {"n": "Darling Psychology", "rev": 4000, "teams": {"Google": 1250, "Meta": 2000, "SEO": 500, "Social": 250}}, {"n": "Blue Spring Day School", "rev": 3900, "teams": {"Google": 1950, "Meta": 1950}}, {"n": "ASET", "rev": 3500, "teams": {"Meta": 1125, "Google": 1125, "Web": 625, "GHL": 625}}, {"n": "E11EVEN MIAMI", "rev": 3500, "teams": {"Social": 2250, "Meta": 625, "Google": 625}}, {"n": "Best Tickets", "rev": 3500, "teams": {"Email": 750, "Creative": 1000, "Meta": 875, "Google": 875}}, {"n": "Mama Betty's - Burnet", "rev": 3250, "teams": {"Email": 500, "Meta": 750, "Google": 500, "Social": 1500}}, {"n": "Mama Betty's - Parmer", "rev": 3250, "teams": {"Email": 500, "Meta": 750, "Google": 500, "Social": 1500}}, {"n": "Tejas Brewery", "rev": 3250, "teams": {"Social": 750, "Email": 750, "Google": 875, "Meta": 875}}, {"n": "Leap Funding", "rev": 3000, "teams": {"Web": 1500, "Creative": 500, "Meta": 1000}}, {"n": "So Shall We", "rev": 3000, "teams": {"Email": 3000}}, {"n": "Rose Gold Presents", "rev": 3000, "teams": {"Meta": 3000}}, {"n": "Y2 Yoga", "rev": 2500, "teams": {"Meta": 1250, "Google": 1250}}, {"n": "Mira Med Spa", "rev": 2500, "teams": {"Google": 750, "Meta": 750, "Web": 1000}}, {"n": "Southern Proper Hospitality Group", "rev": 2500, "teams": {"Email": 2500}}, {"n": "Giant Texas", "rev": 2500, "teams": {"Google": 875, "Meta": 875, "Social": 750}}, {"n": "Oceanbox", "rev": 2500, "teams": {"Email": 2500}}, {"n": "Gumby's Pizza", "rev": 2250, "teams": {"Meta": 1125, "Google": 1125}}, {"n": "Holland Law Group", "rev": 2250, "teams": {"Meta": 1250, "Web": 500, "SEO": 500}}, {"n": "Idalia Photography", "rev": 2000, "teams": {"Meta": 1000, "Creative": 1000}}, {"n": "Nectr", "rev": 1750, "teams": {"Email": 1750}}, {"n": "Kaaba Luum", "rev": 1750, "teams": {"Meta": 875, "Web": 875}}, {"n": "Giant Party Sports", "rev": 1750, "teams": {"Meta": 875, "Google": 875}}, {"n": "Granite-Plus", "rev": 1750, "teams": {"Google": 875, "Meta": 875}}, {"n": "First City Dental", "rev": 1750, "teams": {"Meta": 875, "Google": 875}}, {"n": "Crowd Wear", "rev": 1600, "teams": {"Web": 500, "Social": 600, "Email": 500}}, {"n": "Lice Treatment Center", "rev": 1600, "teams": {"Meta": 1000, "Social": 600}}, {"n": "Club 76", "rev": 1500, "teams": {"Meta": 1500}}, {"n": "Fast Conversational Spanish", "rev": 1500, "teams": {"Meta": 1000, "Creative": 500}}, {"n": "Emily Daniels", "rev": 1500, "teams": {"Meta": 1500}}, {"n": "Dental Team of Ocala", "rev": 1500, "teams": {"Google": 1000, "Web": 500}}, {"n": "7th Dimension Aesthetics", "rev": 1500, "teams": {"Meta": 1000, "Creative": 500}}, {"n": "NuLife Institute", "rev": 1500, "teams": {"Social": 1500}}, {"n": "Manatee Vans", "rev": 1500, "teams": {"Google": 1000, "Web": 500}}, {"n": "McIntyres - Southtown", "rev": 1250, "teams": {"Email": 575, "Social": 550, "Meta": 125}}, {"n": "McIntyres - Webster", "rev": 1250, "teams": {"Email": 575, "Social": 550, "Meta": 125}}, {"n": "McIntyres - North Star", "rev": 1250, "teams": {"Email": 575, "Social": 550, "Meta": 125}}, {"n": "McIntyres - Heights", "rev": 1250, "teams": {"Email": 575, "Social": 550, "Meta": 125}}, {"n": "Goodmellow", "rev": 1125, "teams": {"Email": 750, "Meta": 375}}, {"n": "Ryan Brand", "rev": 1050, "teams": {"Social": 1050}}, {"n": "Candy Cloud", "rev": 1000, "teams": {"Email": 1000}}, {"n": "Lunge", "rev": 1000, "teams": {"Meta": 1000}}, {"n": "Egg Posh", "rev": 1000, "teams": {"Email": 1000}}, {"n": "Fun On The Run Paintball Park", "rev": 1000, "teams": {"Meta": 1000}}, {"n": "Discount Paintball", "rev": 1000, "teams": {"Google": 1000}}, {"n": "X Factor Paintball", "rev": 1000, "teams": {"Meta": 1000}}, {"n": "Extreme Velocity", "rev": 1000, "teams": {"Meta": 1000}}, {"n": "Nautical Bowls", "rev": 1000, "teams": {"Email": 1000}}, {"n": "Crust Pizza Co.", "rev": 1000, "teams": {"Email": 1000}}, {"n": "Happy Slice Pizza", "rev": 1000, "teams": {"Google": 500, "Meta": 500}}, {"n": "Infinity Property Management", "rev": 1000, "teams": {"Web": 1000}}, {"n": "JTrain", "rev": 1000, "teams": {"Web": 1000}}, {"n": "FEMME LA", "rev": 1000, "teams": {"Email": 1000}}, {"n": "OKAICOS", "rev": 800, "teams": {"Meta": 800}}, {"n": "Insane Paintball", "rev": 750, "teams": {"Meta": 750}}, {"n": "Inferno Martial Arts", "rev": 750, "teams": {"Meta": 750}}, {"n": "Wild World Paintball", "rev": 750, "teams": {"Meta": 750}}, {"n": "Ismael Triana", "rev": 750, "teams": {"Google": 750}}, {"n": "Infamous", "rev": 750, "teams": {"Meta": 750}}, {"n": "Sobelini", "rev": 750, "teams": {"Meta": 750}}, {"n": "Foxtail Lounge", "rev": 750, "teams": {"Meta": 750}}, {"n": "SoCal Window Coverings", "rev": 750, "teams": {"Social": 750}}, {"n": "Blue Cherry Group", "rev": 750, "teams": {"Meta": 750}}, {"n": "Tejas Beer", "rev": 600, "teams": {"Social": 600}}, {"n": "Boston Paintball", "rev": 500, "teams": {"Meta": 500}}, {"n": "Splat Houston", "rev": 500, "teams": {"Meta": 500}}, {"n": "Green Leaf Pro", "rev": 300, "teams": {"Social": 300}}, {"n": "Nefertari Organics", "rev": 250, "teams": {"Email": 250}}],factors={"Meta": 0.31, "Email": 0.42, "Google": 0.22, "Social": 0.32, "Web": 0.55, "Creative": 0.6, "GHL": 0.5, "SEO": 0.25, "Other": 0.35},teamEmp={"Meta": ["Mark A.", "Dipesh", "Thomas", "Priscila"], "Email": ["Mel", "Eunhye", "Adriana", "Niro"], "Google": ["Sultan", "Salman", "Aneesa"], "Social": ["Peter", "Camila"], "Web": ["Lubin", "Jesus", "Francisco"], "Creative": ["Nelson", "Jazem", "Mira"], "GHL": ["Clare", "Kennedy"], "SEO": ["(Google team)"], "Other": ["-"]},swBreak={"Meta": [["Deal.ai", 124], ["Motion (50%)", 404], ["Supermetrics (50%)", 222], ["Claude + Slack \u00b7 9 seats", 448]], "Email": [["Figma", 302], ["EmailLove", 35], ["Claude + Slack \u00b7 7 seats", 348]], "Google": [["Spyfu", 39], ["Supermetrics (50%)", 222], ["Claude + Slack \u00b7 2 seats", 99]], "Social": [["Claude + Slack \u00b7 1 seat", 50]], "Web": [["Hosting \u00b7 GoDaddy, Hostinger, WP", 224], ["Claude + Slack \u00b7 3 seats", 149]], "Creative": [["Motion (50%)", 404], ["Design \u00b7 Adobe, Canva, stock", 184], ["AI media \u00b7 Arcads, Higgsfield +3", 151], ["Claude + Slack \u00b7 3 seats", 149]], "SEO": [["Conversion \u00b7 Seona.ai", 195], ["Bulls Eye Media", 7]], "GHL": [["GoHighLevel", 136]]},monthly=[["Jan", 124700], ["Feb", 134253], ["Mar", 149275], ["Apr", 144250], ["May", 139425]],xeroIncr=[{"cat": "Contractors", "apr": 47110, "may": 51906, "incr": 4796, "items": [["Wise", 21671], ["Wise (money transfer)", 19988], ["Lubin Cardenas", 4500], ["Upwork", 917], ["Priscila Aguilera", 788], ["Mira Dubovets", 757], ["Charlie Carpenter", 750], ["Lucas Briceno", 734]]}, {"cat": "Meals", "apr": 0, "may": 816, "incr": 816, "items": [["Nobu", 816]]}, {"cat": "Softwares", "apr": 7537, "may": 8057, "incr": 520, "items": [["RiversideFM", 1021], ["Motion", 850], ["Toggl", 785], ["Google", 784], ["Claude.ai", 724], ["Supermetrics", 443], ["HighLevel", 354], ["Klaviyo", 319]]}, {"cat": "Bank Service Charges", "apr": 0, "may": 400, "incr": 400, "items": [["Amex", 400]]}, {"cat": "Car & Truck", "apr": 0, "may": 170, "incr": 170, "items": [["Two Oils", 163], ["Tesla", 7]]}];
+const teamColor={};teams.forEach(t=>teamColor[t.n]=t.c);teamColor["Other"]="#67676F";
+const offClients=["Tejas Brewery","Giant Texas","Oceanbox","Tejas Beer"];
+const fmt=n=>"$"+Math.round(n).toLocaleString();
+function clientCost(c){let t=0;for(const[k,v]of Object.entries(c.teams))t+=v*(factors[k]||.35);return t;}
+clients.forEach(c=>{c.cost=clientCost(c);c.margin=c.rev-c.cost;c.mpct=c.rev?c.margin/c.rev*100:0;});
+// team table with hoverable labor + software cells
+const tb=document.getElementById("teambody");
+teams.forEach(t=>{const tr=document.createElement("tr");let margin,pct;
+ if(t.lab!==null){const m=t.mrr-t.lab-t.sw,p=m/t.mrr*100,neg=m<0;
+  margin=`<td style="${neg?'color:var(--red-dk);font-weight:700':''}">${(neg?'−$':'$')+Math.abs(Math.round(m)).toLocaleString()}</td>`;
+  pct=`<td><span class="mm"><span class="meter"><i style="width:${Math.max(0,Math.min(100,p))}%;${neg?'background:var(--red-dk)':''}"></i></span><span class="pct" style="${neg?'color:var(--red-dk)':''}">${p.toFixed(1)}%</span></span></td>`;
+ }else{margin=`<td class="pending">labor pending</td>`;pct=`<td class="pending">—</td>`;}
+ const labcell=t.lab!==null?`<td class="hcell" data-team="${t.n}" data-kind="labor"><span class="u">${fmt(t.lab)}</span></td>`:`<td class="pending">—</td>`;
+ const swcell=`<td class="hcell" data-team="${t.n}" data-kind="sw"><span class="u">${fmt(t.sw)}</span></td>`;
+ tr.innerHTML=`<td><span class="team-tag" style="background:${t.c}"></span>${t.n}</td><td class="hcell" data-team="${t.n}" data-kind="mrr"><span class="u">${fmt(t.mrr)}</span></td>`+labcell+swcell+margin+pct;tb.appendChild(tr);});
+// per client sorted lowest margin first
+const cb=document.getElementById("clibody");
+[...clients].sort((a,b)=>a.mpct-b.mpct).forEach(c=>{const neg=c.margin<0,off=offClients.includes(c.n);
+ const r=document.createElement("div");r.className="clirow crow";r.dataset.n=c.n;
+ r.innerHTML=`<div class="cn">${c.n}${off?'<span class="off-tag">check/ACH</span>':''}</div><div class="v">${fmt(c.rev)}</div><div class="v cost">${fmt(c.cost)}</div><div class="v" style="${neg?'color:var(--red-dk)':''}">${(neg?'−$':'$')+Math.abs(Math.round(c.margin)).toLocaleString()}</div><div class="v mpct" style="color:${c.mpct<35?'var(--red-dk)':c.mpct>65?'var(--grn)':'var(--ink)'}">${c.mpct.toFixed(0)}%</div>`;cb.appendChild(r);});
+document.getElementById("clicount").textContent=clients.length+" active clients · 68 Stripe + 4 off-Stripe";
+// employees
+const eb=document.getElementById("empbody");
+roster.forEach(([team,name,rate,type])=>{const r=document.createElement("div");r.className="emprow";
+ const pill=type==="salary"?'<span class="pill s">salary</span>':type==="contractor"?'<span class="pill c">contractor</span>':'<span class="pill h">hourly</span>';
+ r.innerHTML=`<div class="en">${name}</div><div class="et"><span class="team-tag" style="background:${teamColor[team]||'#67676F'}"></span>${team} ${pill}</div><div class="er">${rate}</div>`;eb.appendChild(r);});
+// pulse rankings
+function rankRow(c,i,good){return `<div class="rank rrow" data-n="${c.n}"><div class="rn"><span class="ri">${i+1}</span>${c.n}</div><div><span style="color:var(--faint);font-size:11px">${fmt(c.margin)}</span> &nbsp; <span class="rv ${good?'good':'bad'}">${c.mpct.toFixed(0)}%</span></div></div>`;}
+const ranked=[...clients].filter(c=>c.rev>0).sort((a,b)=>b.mpct-a.mpct);
+document.getElementById("topgood").innerHTML=ranked.slice(0,5).map((c,i)=>rankRow(c,i,true)).join("");
+document.getElementById("topbad").innerHTML=ranked.slice(-5).reverse().map((c,i)=>rankRow(c,i,false)).join("");
+const tc=document.getElementById("teamcost");
+teams.map(t=>({n:t.n,c:t.c,cost:(t.lab||0)+t.sw})).sort((a,b)=>b.cost-a.cost).forEach(t=>{const d=document.createElement("div");d.className="tcrow";d.dataset.team=t.n;
+ d.innerHTML=`<div class="tn"><span class="team-tag" style="background:${t.c}"></span>${t.n}</div><div><span style="color:var(--faint);font-size:11px">MoM —</span> &nbsp; <span class="tv">${fmt(t.cost)}</span></div>`;tc.appendChild(d);});
+// xero biggest cost increases
+const xi=document.getElementById("xeroincr");
+xeroIncr.forEach((x,i)=>{const d=document.createElement("div");d.className="tcrow";d.dataset.xi=i;
+ d.innerHTML=`<div class="tn">${x.cat}</div><div><span style="color:var(--faint);font-size:11px">${fmt(x.apr)} → ${fmt(x.may)}</span> &nbsp; <span class="tv" style="color:var(--red-dk)">+${fmt(x.incr)}</span></div>`;xi.appendChild(d);});
+// projection chart (real Jan-May + sample June)
+const chart=document.getElementById("chart");const proj=146800;const all=[...monthly,["Jun",proj]];const max=Math.max(...all.map(m=>m[1]));
+all.forEach(([m,v],i)=>{const isP=i===all.length-1,isCur=m==="May";const d=document.createElement("div");d.className="bar"+(isP?" proj":isCur?" cur":"");
+ d.innerHTML=`<div class="bv">$${Math.round(v/1000)}k</div><div class="bb" style="height:${v/max*100}%"></div><div class="bm">${m}${isP?'*':''}</div>`;chart.appendChild(d);});
+// hovers
+const hv=document.getElementById("hover");
+function place(e){let x=e.clientX+16,y=e.clientY+12;if(x+308>innerWidth)x=e.clientX-308;if(y+hv.offsetHeight>innerHeight)y=innerHeight-hv.offsetHeight-10;hv.style.left=x+"px";hv.style.top=y+"px";}
+function clientHover(c){const ents=Object.entries(c.teams).sort((a,b)=>b[1]-a[1]);let rows="",tot=0;
+ ents.forEach(([t,rev])=>{const cost=rev*(factors[t]||.35);tot+=cost;rows+=`<div class="hrow"><div class="ht2"><span class="team-tag" style="background:${teamColor[t]||'#67676F'}"></span>${t}</div><div><span style="color:var(--muted)">${fmt(rev)} rev</span> &nbsp; <span class="hv hcost">${fmt(cost)}</span></div></div>`;});
+ const top=ents[0][0],emps=(teamEmp[top]||[]).slice(0,3);let dr="";emps.forEach((e,i)=>{dr+=`<div class="demp"><span class="dn">${e}</span><span>${fmt(ents[0][1]*(factors[top]||.35)*[0.5,0.3,0.2][i])}</span></div>`;});
+ return `<div class="ht">${c.n}</div><div class="hsub">${fmt(c.rev)} revenue · ${fmt(tot)} modeled cost</div>${rows}<div class="hdrv">Sample drivers · ${top} team</div>${dr}<div class="hmodel">Modeled split. Real per-employee hours arrive with Toggl.</div>`;}
+function laborHover(tn){const t=teams.find(x=>x.n===tn);const emps=(teamEmp[tn]||[]).filter(e=>e!=="(Google team)"&&e!=="-");let dr="";const w=[.34,.26,.22,.18];
+ emps.slice(0,4).forEach((e,i)=>{dr+=`<div class="demp"><span class="dn">${e}</span><span>${fmt((t.lab||0)*(w[i]||.1))}</span></div>`;});
+ if(!emps.length)dr=`<div class="demp"><span class="dn">No dedicated staff</span><span>—</span></div>`;
+ return `<div class="ht">${tn} · labor</div><div class="hsub">${fmt(t.lab||0)} total this month</div><div class="hdrv">Employee breakdown</div>${dr}<div class="hmodel">Modeled split of team labor. Real per-person hours arrive with Toggl.</div>`;}
+function swHover(tn){const t=teams.find(x=>x.n===tn);const items=swBreak[tn]||[];let rows="";
+ items.forEach(([name,amt])=>{rows+=`<div class="hrow"><div class="ht2">${name}</div><div class="hv">${fmt(amt)}</div></div>`;});
+ return `<div class="ht">${tn} · software</div><div class="hsub">${fmt(t.sw)} this month</div>${rows}<div class="hreal">Validated from the allocation key.</div>`;}
+function mrrHover(tn){const t=teams.find(x=>x.n===tn);
+ const list=clients.filter(c=>c.teams[tn]).map(c=>[c.n,c.teams[tn]]).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ let rows="";list.forEach(([n,v],i)=>{rows+=`<div class="demp"><span class="dn">${i+1}. ${n}</span><span>${fmt(v)}</span></div>`;});
+ return `<div class="ht">${tn} · top clients</div><div class="hsub">${fmt(t.mrr)} MRR this month</div><div class="hdrv">Top 5 by ${tn} revenue</div>${rows}<div class="hreal">Client revenue from Stripe.</div>`;}
+function xeroHover(i){const x=xeroIncr[i];let rows="";x.items.forEach(([m,a])=>{rows+=`<div class="demp"><span class="dn">${m}</span><span>${fmt(a)}</span></div>`;});
+ return `<div class="ht">${x.cat} · +${fmt(x.incr)}</div><div class="hsub">${fmt(x.apr)} April → ${fmt(x.may)} May</div><div class="hdrv">May transactions</div>${rows}<div class="hreal">Itemized from Xero.</div>`;}
+function bind(sel,html){document.querySelectorAll(sel).forEach(el=>{el.addEventListener("mousemove",e=>{const h=html(el);if(!h){hv.style.display="none";return;}hv.innerHTML=h;hv.style.display="block";place(e);});el.addEventListener("mouseleave",()=>hv.style.display="none");});}
+bind(".clirow.crow",el=>clientHover(clients.find(c=>c.n===el.dataset.n)));
+bind("td.hcell",el=>el.dataset.kind==="labor"?laborHover(el.dataset.team):el.dataset.kind==="sw"?swHover(el.dataset.team):mrrHover(el.dataset.team));
+bind(".rank.rrow",el=>clientHover(clients.find(c=>c.n===el.dataset.n)));
+bind(".tcrow[data-team]",el=>teamHover(el.dataset.team));
+bind(".tcrow[data-xi]",el=>xeroHover(+el.dataset.xi));
+const tabs=[...document.querySelectorAll(".tab")];
+tabs.forEach(t=>t.addEventListener("click",()=>{tabs.forEach(x=>x.setAttribute("aria-selected","false"));document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));t.setAttribute("aria-selected","true");document.getElementById(t.dataset.p).classList.add("active");hv.style.display="none";}));
+</script></body></html>
