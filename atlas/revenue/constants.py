@@ -23,6 +23,7 @@ SERVICE_TO_TEAM: dict[str, str] = {
     "SMS Marketing": "Email",
     "Organic Social": "Social",
     "Social Media Management": "Social",
+    "Organic Social Media Management": "Social",
     "Content Creation": "Social",
     "Website Development": "Web",
     "Creative Package": "Creative",

@@ -151,6 +151,13 @@ def test_content_creation_maps_to_social():
     assert map_to_team("Content Creation") == "Social"
 
 
+def test_organic_social_media_management_maps_to_social():
+    # Stripe uses the compound phrase, not the two separate keys
+    from atlas.revenue.classifier import map_to_team
+    assert map_to_team("Organic Social Media Management") == "Social"
+    assert map_to_team("1 • Organic Social Media Management (at $750.00 / month)") == "Social"
+
+
 def test_unknown_maps_to_other():
     from atlas.revenue.classifier import map_to_team
     assert map_to_team("Something Unknown") == "Other"
