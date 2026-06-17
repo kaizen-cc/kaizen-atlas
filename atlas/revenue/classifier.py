@@ -1,8 +1,8 @@
 import re
 from .constants import SERVICE_TO_TEAM, PASS_THROUGH_DESCRIPTION
 
-# Matches leading quantity prefix: "3 x ", "1 x ", etc.
-_QTY_PREFIX = re.compile(r"^\d+\s*[xX]\s*")
+# Matches leading quantity prefix: "3 x ", "1 x ", "1 • " (Stripe uses U+2022 bullet as separator)
+_QTY_PREFIX = re.compile(r"^\d+\s*[xX•]\s*")
 
 # Matches trailing period-price suffix: " (at $750.00 / month)" etc.
 _PERIOD_SUFFIX = re.compile(r"\s*\(at \$[\d,]+\.?\d*\s*/\s*\w+\)\s*$")

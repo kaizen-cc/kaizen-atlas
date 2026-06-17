@@ -113,6 +113,12 @@ def test_normalize_strips_quantity_prefix():
     assert normalize("3 x Meta Advertising (at $750.00 / month)") == "Meta Advertising"
 
 
+def test_normalize_strips_bullet_prefix():
+    # Stripe uses U+2022 bullet as quantity separator, not letter x
+    from atlas.revenue.classifier import normalize
+    assert normalize("1 • Meta Advertising (at $875.00 / month)") == "Meta Advertising"
+
+
 def test_normalize_strips_period_suffix():
     from atlas.revenue.classifier import normalize
     assert normalize("Email Marketing (at $1,500.00 / month)") == "Email Marketing"

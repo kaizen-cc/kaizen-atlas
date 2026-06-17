@@ -50,6 +50,11 @@ def _is_eligible(invoice: dict) -> bool:
     return _customer_name(invoice) in OFF_STRIPE_RESCUE
 
 
+def _invoice_created_month(invoice: dict) -> tuple[int, int]:
+    dt = datetime.datetime.fromtimestamp(invoice["created"], tz=datetime.timezone.utc)
+    return dt.year, dt.month
+
+
 def _subscription_period_month(line: dict) -> tuple[int, int] | None:
     """Return (year, month) from a subscription line item's period.
 
@@ -111,11 +116,17 @@ def compute_revenue(year: int, month: int) -> RevenueResult:
 
             if _line_type(line) == "subscription":
                 period_ym = _subscription_period_month(line)
-                # Only count MRR that belongs to this calendar month
+                # Only count MRR whose subscription period belongs to this month.
+                # Invoices are created in the prior month (billed in advance), so
+                # we must filter by period — not by invoice created date.
                 if period_ym and period_ym == (year, month):
                     result.mrr_by_team[team] += amount_dollars
             else:
-                result.oneoff_by_team[team] += amount_dollars
+                # One-off lines: only count if the invoice was created in the
+                # target month. The two-month fetch window means M-1 invoices
+                # are also present, but their one-off lines belong to M-1.
+                if _invoice_created_month(inv) == (year, month):
+                    result.oneoff_by_team[team] += amount_dollars
 
             if team == "Other":
                 result.unmatched_lines.append(
