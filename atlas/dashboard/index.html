@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kaizen atlas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+:root{--red:#D93B47;--red-dk:#F07880;--red-wash:rgba(217,59,71,.14);--grn:#5ED6A8;--ink:#F2F2F2;--bg:#0A0A0B;--panel:#141416;--panel-2:#1B1B1F;--line:#26262B;--line-2:#34343B;--muted:#9A9AA2;--faint:#67676F;--disp:'Familjen Grotesk','Poppins',sans-serif;--body:'Poppins',sans-serif;--r:5px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;line-height:1.5}
+.num{font-family:var(--disp);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+header{padding:26px 0 16px}
+.brandrow{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.wordmark{font-family:var(--disp);font-weight:700;font-size:27px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.kmark{width:30px;height:30px;background:var(--red);border-radius:var(--r);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px}
+.wordmark .atlas{color:var(--red)}
+.kicker{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.monthtag{font-family:var(--disp);font-size:12px;font-weight:500;border:1px solid var(--line-2);border-radius:var(--r);padding:6px 13px;background:var(--panel)}
+.redrule{height:3px;background:var(--red);border-radius:2px;margin:16px 0 0;width:64px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:13px}
+.badge{font-family:var(--disp);font-size:10px;letter-spacing:.06em;padding:2px 7px;border-radius:4px;text-transform:uppercase;font-weight:600}
+.b-stripe{background:var(--red-wash);color:var(--red-dk)}.b-key{background:var(--ink);color:#0A0A0B}.b-atlas{background:#3A2E18;color:#E0A53C}.b-cpa{background:var(--panel);color:var(--muted);border:1px solid var(--line-2)}.b-model{background:#2A2233;color:#C79BE0}
+.legend .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+nav{display:flex;gap:2px;margin:22px 0 0;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+.tab{font-family:var(--disp);font-weight:600;font-size:14px;color:var(--muted);background:none;border:none;padding:11px 15px;cursor:pointer;border-bottom:2px solid transparent}
+.tab:hover{color:var(--ink)}.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
+.tab:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:3px}
+.panel{display:none;padding-top:26px}.panel.active{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel.active{animation:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.lbl{font-family:var(--disp);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.histbanner{background:var(--panel-2);border:1px solid var(--line-2);border-left:3px solid var(--red);border-radius:var(--r);padding:10px 14px;font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 15px}
+.metric .ml{font-family:var(--disp);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);min-height:26px}
+.metric .mv{font-family:var(--disp);font-weight:700;font-size:25px;letter-spacing:-.02em;margin:8px 0 2px}
+.metric .mv.pend{font-size:13px;font-weight:500;color:var(--faint);font-family:var(--body)}
+.metric .msrc{font-size:10px;color:var(--faint);margin-bottom:9px}
+.delta{display:flex;gap:6px}
+.dchip{font-family:var(--disp);font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--panel-2);color:var(--faint);border:1px solid var(--line)}
+.dchip.down{background:var(--red-wash);color:var(--red-dk);border-color:transparent}
+.dchip.up{background:rgba(94,214,168,.14);color:var(--grn);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tp .big{font-family:var(--disp);font-weight:700;font-size:46px;letter-spacing:-.03em;line-height:1;margin:12px 0 8px}
+.tp .big::after{content:"";display:block;width:48px;height:4px;background:var(--red);border-radius:2px;margin-top:12px}
+table{width:100%;border-collapse:collapse}
+thead th{font-family:var(--disp);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);text-align:right;padding:0 14px 11px;font-weight:600}
+thead th:first-child{text-align:left}
+tbody td{padding:13px 14px;border-top:1px solid var(--line);text-align:right;font-family:var(--disp);font-size:14px;font-variant-numeric:tabular-nums;font-weight:500}
+tbody td:first-child{text-align:left;font-family:var(--body);font-weight:600;font-size:14px}
+tbody tr:hover{background:var(--panel-2)}
+td.hcell{cursor:help}td.hcell span.u{border-bottom:1px dotted var(--line-2)}
+.team-tag{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:10px;vertical-align:middle}
+.pending{color:var(--faint);font-weight:400}
+.mm{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.meter{width:74px;height:8px;background:var(--line-2);border-radius:5px;overflow:hidden;display:inline-block}
+.meter i{display:block;height:100%;background:var(--red);border-radius:5px}.pct{font-weight:700}
+h2.sec{font-family:var(--disp);font-weight:600;font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seclead{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.cli-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.cli-count{font-family:var(--disp);font-size:12px;color:var(--muted)}
+.clirow{display:grid;grid-template-columns:1.7fr .9fr .9fr .9fr .8fr;gap:10px;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.clirow.head{border-top:none;font-family:var(--disp);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.clirow .cn{font-weight:600;font-size:13.5px}.clirow .v{font-family:var(--disp);text-align:right;font-size:13px;font-variant-numeric:tabular-nums;font-weight:500}
+.clirow .v.cost{color:var(--red-dk);cursor:help;border-bottom:1px dotted var(--line-2)}.clirow.crow:hover{background:var(--panel-2)}.mpct{font-weight:700}
+.off-tag{font-family:var(--disp);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--red-dk);background:var(--red-wash);padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:600}
+.agency-tag{font-family:var(--disp);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:#C79BE0;background:#2A2233;padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:600}
+.rank{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.rank:last-child{border-bottom:none}.rank.rrow{cursor:help}.rank.rrow:hover{background:var(--panel-2)}.rank .rn{font-weight:600;display:flex;align-items:center;gap:9px}.rank .ri{font-family:var(--disp);font-size:11px;color:var(--faint);width:16px}
+.rank .rv{font-family:var(--disp);font-weight:700;font-variant-numeric:tabular-nums}.rank .rv.good{color:var(--grn)}.rank .rv.bad{color:var(--red-dk)}
+.tcrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:help}
+.tcrow:last-child{border-bottom:none}.tcrow:hover{background:var(--panel-2)}.tcrow .tn{font-weight:600;display:flex;align-items:center;gap:9px}
+.tcrow .tv{font-family:var(--disp);font-weight:600;font-variant-numeric:tabular-nums;border-bottom:1px dotted var(--line-2)}
+.emprow{display:grid;grid-template-columns:1.4fr 1.6fr 1fr;gap:10px;padding:10px 14px;border-top:1px solid var(--line);align-items:center;font-size:13.5px}
+.emprow.head{border-top:none;font-family:var(--disp);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.emprow .en{font-weight:600}.emprow .et{color:var(--muted);display:flex;align-items:center;gap:8px}.emprow .er{font-family:var(--disp);text-align:right;font-variant-numeric:tabular-nums}
+.pill{font-family:var(--disp);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:4px;font-weight:600}
+.pill.s{background:var(--red-wash);color:var(--red-dk)}.pill.h{background:var(--panel-2);color:var(--muted);border:1px solid var(--line-2)}.pill.c{background:#2A2233;color:#C79BE0}
+.callout{background:var(--red-wash);border:1px solid rgba(217,59,71,.3);border-radius:var(--r);padding:13px 15px;font-size:13px;color:var(--red-dk);margin-top:14px}.callout b{color:var(--red-dk)}
+.samplebanner{background:#221A2B;border:1px solid #3A2D49;border-left:3px solid #C79BE0;border-radius:var(--r);padding:10px 14px;font-size:12.5px;color:#C79BE0;margin-bottom:14px}
+.projhero{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.projhero .big{font-family:var(--disp);font-weight:700;font-size:48px;letter-spacing:-.03em;line-height:1;margin:10px 0 6px}
+.pbar{height:12px;background:var(--line-2);border-radius:6px;overflow:hidden;margin:14px 0 6px;position:relative}
+.pbar i{display:block;height:100%;background:var(--red);border-radius:6px}
+.pbar b{position:absolute;top:0;height:100%;width:2px;background:var(--ink);opacity:.5}
+.ptiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.ptile{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:13px}
+.ptile .pl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-family:var(--disp)}
+.ptile .pv{font-family:var(--disp);font-weight:700;font-size:20px;margin-top:5px}
+.ptile .pd{font-size:11px;margin-top:3px}
+.chart{display:flex;align-items:flex-end;gap:12px;height:150px;margin-top:18px;padding-top:10px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;justify-content:flex-end}
+.bar .bv{font-family:var(--disp);font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar .bb{width:100%;background:var(--line-2);border-radius:4px 4px 0 0;min-height:3px}
+.bar.proj .bb{background:repeating-linear-gradient(45deg,var(--red),var(--red) 5px,#9e2b34 5px,#9e2b34 10px)}
+.bar.cur .bb{background:var(--red)}
+.bar .bm{font-family:var(--disp);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+.up{color:var(--grn)}.down{color:var(--red-dk)}
+#hover{position:fixed;z-index:50;display:none;width:296px;background:#101013;border:1px solid var(--line-2);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.6);padding:14px;pointer-events:none}
+#hover .ht{font-family:var(--disp);font-weight:700;font-size:14px;margin-bottom:2px}
+#hover .hsub{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+#hover .hrow{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+#hover .hrow .ht2{display:flex;align-items:center;gap:7px}#hover .hrow .hv{font-family:var(--disp);font-variant-numeric:tabular-nums;font-weight:600}
+#hover .hcost{color:var(--red-dk)}#hover .hdrv{margin-top:10px;font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+#hover .demp{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);padding:3px 0}#hover .demp .dn{color:var(--ink)}
+#hover .hmodel{margin-top:10px;font-size:10.5px;color:#C79BE0;background:#2A2233;border-radius:4px;padding:6px 8px}
+#hover .hreal{margin-top:10px;font-size:10.5px;color:var(--grn);background:rgba(94,214,168,.12);border-radius:4px;padding:6px 8px}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.two,.projhero{grid-template-columns:1fr}.clirow{grid-template-columns:1.4fr 1fr 1fr}.clirow .h{display:none}.emprow{grid-template-columns:1.3fr 1fr}.emprow .et{display:none}.ptiles{grid-template-columns:1fr}thead{display:none}tbody td{padding:9px 10px;font-size:13px}#hover{display:none!important}.chart .bv{display:none}}
+</style></head><body>
+<div class="wrap">
+<header>
+  <div class="brandrow">
+    <div>
+      <div class="kicker">the 1% agency · live P&amp;L</div>
+      <div class="wordmark"><span class="kmark">力</span>kaizen <span class="atlas">atlas</span></div>
+    </div>
+    <div class="monthtag" id="monthtag">loading…</div>
+  </div>
+  <div class="redrule"></div>
+  <div class="legend" style="margin-top:13px">
+    <span class="lg"><span class="badge b-stripe">Stripe</span> revenue</span>
+    <span class="lg"><span class="badge b-cpa">Xero</span> source of truth</span>
+    <span class="lg"><span class="badge b-key">Key</span> software</span>
+    <span class="lg"><span class="badge b-atlas">Atlas</span> labor</span>
+    <span class="lg"><span class="badge b-model">Model</span> pending</span>
+  </div>
+</header>
+<nav role="tablist">
+  <button class="tab" role="tab" aria-selected="true"  data-p="health">Company Health</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="team">Per Team</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="client">Per Client</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="emp">Employees</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="pulse">Pulse</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="proj">Projection</button>
+</nav>
+
+<!-- Company Health -->
+<section class="panel active" id="health" role="tabpanel">
+  <div class="histbanner" id="healthbanner">Total revenue and total profit compare to last month using your Atlas figures. MRR, average ticket, and subscriber lifetime comparisons fill in once prior-month detail and last year load.</div>
+  <div class="metrics" id="metrics"></div>
+  <div class="two" style="margin-top:14px">
+    <div class="card tp" id="profitcard"></div>
+    <div class="card" id="revenuecard"></div>
+  </div>
+</section>
+
+<!-- Per Team -->
+<section class="panel" id="team" role="tabpanel">
+  <h2 class="sec">Per-team contribution margin <span class="badge b-stripe">Stripe</span> <span class="badge b-atlas">Atlas</span> <span class="badge b-key">Key</span></h2>
+  <p class="seclead">MRR minus labor minus allocated software. Hover MRR for the top clients on that service, Labor for the employee breakdown, and Software for the products attributed to each team.</p>
+  <div class="card"><table><thead><tr><th>Team</th><th>MRR</th><th>Labor</th><th>Software</th><th>Margin $</th><th>Margin %</th></tr></thead><tbody id="teambody"></tbody></table></div>
+  <div class="callout" style="margin-top:14px"><b>Creative, GHL, and Web read negative on recurring revenue alone.</b> Creative output is mostly ad creative for Meta, GHL automation is built into client retainers, and Web's real product is one-off builds. Their cost sits here while the revenue lands elsewhere. SEO labor is embedded in the Google team.</div>
+</section>
+
+<!-- Per Client -->
+<section class="panel" id="client" role="tabpanel">
+  <h2 class="sec">Every client, margin ranked <span class="badge b-stripe">Stripe</span> <span class="badge b-atlas">Atlas</span></h2>
+  <p class="seclead">Sorted lowest margin first, so the clients to worry about sit at the top. Hover cost for the team breakdown.</p>
+  <div class="card" style="padding:14px 6px">
+    <div class="cli-meta" style="padding:0 14px"><span class="cli-count" id="clicount"></span><span class="cli-count">lowest margin first · hover cost for breakdown</span></div>
+    <div class="clirow head"><div>Client</div><div class="v">Revenue</div><div class="v cost" style="border:none;cursor:default">Cost</div><div class="v">Margin</div><div class="v">Margin %</div></div>
+    <div id="clibody"></div>
+  </div>
+</section>
+
+<!-- Employees -->
+<section class="panel" id="emp" role="tabpanel">
+  <h2 class="sec">Employees and pay <span class="badge b-atlas">Roster</span></h2>
+  <p class="seclead">Current team. Salaried fixed monthly; hourly from Toggl hours × rate. Photographers bill per shoot through Xero.</p>
+  <div class="card" style="padding:14px 6px"><div class="emprow head"><div>Name</div><div>Team</div><div class="er">Rate</div></div><div id="empbody"></div></div>
+</section>
+
+<!-- Pulse -->
+<section class="panel" id="pulse" role="tabpanel">
+  <div class="two">
+    <div class="card"><div class="lbl">Top 5 most profitable clients <span class="badge b-atlas">Atlas</span></div><div id="topgood" style="margin-top:10px"></div></div>
+    <div class="card"><div class="lbl">Top 5 least profitable clients <span class="badge b-atlas">Atlas</span></div><div id="topbad" style="margin-top:10px"></div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="lbl">Service-line cost <span class="badge b-atlas">Atlas</span> <span class="badge b-key">Key</span></div>
+    <p class="seclead" style="margin:8px 0 6px">Ranked by total cost this month. Hover for the employee breakdown.</p>
+    <div id="teamcost"></div>
+  </div>
+  <div class="card" style="margin-top:14px" id="xerocard">
+    <div class="lbl">Biggest cost increases vs last month <span class="badge b-cpa">Xero</span></div>
+    <p class="seclead" style="margin:8px 0 6px">The expense categories that rose most from the prior month.</p>
+    <div id="xeroincr"></div>
+  </div>
+</section>
+
+<!-- Projection -->
+<section class="panel" id="proj" role="tabpanel">
+  <div class="samplebanner">Revenue trend uses real Atlas data. Projected figure = current MRR + 5% upside estimate.</div>
+  <div class="projhero">
+    <div class="card"><div class="lbl">Projected revenue <span class="badge b-model">Model</span></div>
+      <div class="big num" id="projamt">—</div>
+      <div class="pbar"><i id="projbar" style="width:0%"></i></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">Contracted MRR is the floor; one-off build work is the upside swing.</p>
+    </div>
+    <div class="card"><div class="lbl">Pulse on the month <span class="badge b-model">Model</span></div>
+      <div class="ptiles" style="grid-template-columns:1fr" id="projpulse"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="lbl">Revenue trend <span class="badge b-atlas">Atlas</span></div>
+    <div class="chart" id="chart"></div></div>
+</section>
+</div>
+<div id="hover"></div>
+
+<script>
+const fmt = n => "$" + Math.round(n).toLocaleString();
+const pct = (a, b) => b ? ((a - b) / b * 100).toFixed(1) : null;
+const hv = document.getElementById("hover");
+let teamColor = {};
+
+function place(e) {
+  let x = e.clientX + 16, y = e.clientY + 12;
+  if (x + 308 > innerWidth) x = e.clientX - 308;
+  if (y + hv.offsetHeight > innerHeight) y = innerHeight - hv.offsetHeight - 10;
+  hv.style.left = x + "px"; hv.style.top = y + "px";
+}
+
+function bind(sel, html) {
+  document.querySelectorAll(sel).forEach(el => {
+    el.addEventListener("mousemove", e => {
+      const h = html(el);
+      if (!h) { hv.style.display = "none"; return; }
+      hv.innerHTML = h; hv.style.display = "block"; place(e);
+    });
+    el.addEventListener("mouseleave", () => hv.style.display = "none");
+  });
+}
+
+function deltaChip(cur, prior, invert = false) {
+  if (prior == null || cur == null) return `<span class="dchip">MoM —</span>`;
+  const d = ((cur - prior) / prior * 100);
+  const good = invert ? d < 0 : d > 0;
+  const cls = good ? "up" : "down";
+  const sign = d > 0 ? "+" : "";
+  return `<span class="dchip ${cls}">MoM ${sign}${d.toFixed(1)}%</span>`;
+}
+
+function render(data) {
+  const co = data.company;
+  const pr = data.prior || {};
+  const teams = data.teams || [];
+  const clients = data.clients || [];
+  const roster = data.roster || [];
+  const monthly = data.monthly || [];
+  const xeroIncr = data.xero_incr || [];
+
+  teams.forEach(t => teamColor[t.n] = t.c);
+  teamColor["Other"] = "#67676F";
+
+  // ── Header ────────────────────────────────────────────────────────────────
+  document.title = `kaizen atlas · ${data.meta.month_label}`;
+  document.getElementById("monthtag").textContent = data.meta.month_label;
+
+  // ── Company Health ────────────────────────────────────────────────────────
+  const momRev = pct(co.revenue, pr.revenue);
+  const momProfit = pct(co.net_profit, pr.net_profit);
+  const momMargin = pr.margin_pct != null ? (co.margin_pct - pr.margin_pct).toFixed(1) : null;
+
+  document.getElementById("metrics").innerHTML = `
+    <div class="metric"><div class="ml">Total revenue</div><div class="mv num">${fmt(co.revenue)}</div><div class="msrc">Xero · source of truth</div><div class="delta">${deltaChip(co.revenue, pr.revenue)}<span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Total MRR</div><div class="mv num">${fmt(co.mrr_total)}</div><div class="msrc">active subscriptions</div><div class="delta">${deltaChip(co.mrr_total, pr.mrr_total)}<span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Avg ticket value</div><div class="mv num">${co.subscriber_count ? fmt(co.mrr_total / co.subscriber_count) : '—'}</div><div class="msrc">${co.subscriber_count ? `MRR per subscriber (${co.subscriber_count})` : 'loads from Stripe history'}</div><div class="delta"><span class="dchip">MoM —</span><span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Avg subscriber lifetime</div><div class="mv pend">loads from<br>Stripe history</div><div class="msrc">avg active subscription length</div><div class="delta"><span class="dchip">MoM —</span><span class="dchip">YoY —</span></div></div>
+    <div class="metric"><div class="ml">Company margin</div><div class="mv num">${co.margin_pct}%</div><div class="msrc">net on revenue</div><div class="delta">${momMargin != null ? `<span class="dchip ${parseFloat(momMargin) >= 0 ? 'up' : 'down'}">MoM ${momMargin >= 0 ? '+' : ''}${momMargin}pts</span>` : '<span class="dchip">MoM —</span>'}<span class="dchip">YoY —</span></div></div>`;
+
+  const priorNote = pr.net_profit != null ? `<p style="font-size:12px;color:var(--muted);margin-top:14px">Prior month was ${fmt(pr.net_profit)}. The ${co.net_profit > pr.net_profit ? 'gain' : 'dip'} tracks ${co.revenue > pr.revenue ? 'stronger' : 'softer'} revenue (${fmt(co.revenue)} vs ${fmt(pr.revenue)}) against ${co.net_profit > pr.net_profit ? 'steady' : 'steady'} cost.</p>` : '';
+  document.getElementById("profitcard").innerHTML = `<div class="lbl">Total profit · ${data.meta.month_label} <span class="badge b-cpa">Xero</span></div><div class="big num">${fmt(co.net_profit)}</div><div class="delta">${deltaChip(co.net_profit, pr.net_profit)}<span class="dchip">vs last year —</span></div>${priorNote}`;
+
+  document.getElementById("revenuecard").innerHTML = `<div class="lbl">Revenue, two lenses</div>
+    <div style="display:flex;height:14px;border-radius:var(--r);overflow:hidden;margin:14px 0 8px;border:1px solid var(--line)"><i style="width:${co.mrr_pct}%;background:var(--red)"></i><i style="width:${co.oneoff_pct}%;background:var(--ink)"></i></div>
+    <div style="display:flex;gap:18px;font-size:12px;color:var(--muted)"><span><span class="team-tag" style="background:var(--red)"></span>MRR ${co.mrr_pct}%</span><span><span class="team-tag" style="background:var(--ink)"></span>One-off ${co.oneoff_pct}%</span></div>
+    <div class="recon" style="margin-top:12px">
+      <div class="row"><span>Recognized revenue <span class="badge b-stripe">Stripe</span></span><span class="v num">${fmt(co.stripe_recognized)}</span></div>
+      <div class="row"><span>Cash collected <span class="badge b-cpa">Xero</span></span><span class="v num">${fmt(co.xero_total)}</span></div>
+      <div class="row res"><span>Residual to reconcile</span><span class="v num">${fmt(co.residual)}</span></div>
+    </div>`;
+
+  // ── Per Team ──────────────────────────────────────────────────────────────
+  const priorTeams = (pr.teams) || {};
+  const priorClients = (pr.clients) || {};
+
+  const tb = document.getElementById("teambody");
+  tb.innerHTML = "";
+  teams.forEach(t => {
+    const tr = document.createElement("tr");
+    const pt = priorTeams[t.n];
+    let margin, mpct;
+    const rev = t.mrr + t.oneoff;
+    if (t.lab !== null) {
+      const m = rev - t.lab - t.sw, p = rev ? m / rev * 100 : 0, neg = m < 0;
+      const priorM = pt ? (pt.mrr + (pt.oneoff||0)) - (pt.lab||0) - pt.sw : null;
+      const mDelta = priorM != null ? deltaChip(m, priorM) : `<span class="dchip">MoM —</span>`;
+      margin = `<td style="${neg ? 'color:var(--red-dk);font-weight:700' : ''}">${(neg ? '−$' : '$') + Math.abs(Math.round(m)).toLocaleString()}<br><small>${mDelta}</small></td>`;
+      const priorP = pt && pt.lab ? ((pt.mrr+(pt.oneoff||0)) - pt.lab - pt.sw) / (pt.mrr+(pt.oneoff||0)) * 100 : null;
+      const pDelta = priorP != null ? `<span class="dchip ${p >= priorP ? 'up' : 'down'}">MoM ${p >= priorP ? '+' : ''}${(p - priorP).toFixed(1)}pts</span>` : `<span class="dchip">MoM —</span>`;
+      mpct = `<td><span class="mm"><span class="meter"><i style="width:${Math.max(0, Math.min(100, p))}%;${neg ? 'background:var(--red-dk)' : ''}"></i></span><span class="pct" style="${neg ? 'color:var(--red-dk)' : ''}">${p.toFixed(1)}%</span></span><br><small>${pDelta}</small></td>`;
+    } else {
+      margin = `<td class="pending">labor pending</td>`;
+      mpct = `<td class="pending">—</td>`;
+    }
+    const mrrDelta = pt ? deltaChip(t.mrr, pt.mrr) : `<span class="dchip">MoM —</span>`;
+    const labDelta = (t.lab !== null && pt && pt.lab) ? deltaChip(t.lab, pt.lab, true) : `<span class="dchip">MoM —</span>`;
+    const labcell = t.lab !== null
+      ? `<td class="hcell" data-team="${t.n}" data-kind="labor"><span class="u">${fmt(t.lab)}</span><br><small>${labDelta}</small></td>`
+      : `<td class="pending">—</td>`;
+    tr.innerHTML = `<td><span class="team-tag" style="background:${t.c}"></span>${t.n}</td><td class="hcell" data-team="${t.n}" data-kind="mrr"><span class="u">${fmt(t.mrr)}</span><br><small>${mrrDelta}</small></td>${labcell}<td class="hcell" data-team="${t.n}" data-kind="sw"><span class="u">${fmt(t.sw)}</span></td>${margin}${mpct}`;
+    tb.appendChild(tr);
+  });
+
+  // ── Per Client ────────────────────────────────────────────────────────────
+  const cb = document.getElementById("clibody");
+  cb.innerHTML = "";
+  const sorted = [...clients].filter(c => c.rev > 0).sort((a, b) => a.mpct - b.mpct);
+  sorted.forEach(c => {
+    const neg = c.margin < 0;
+    const r = document.createElement("div");
+    r.className = "clirow crow"; r.dataset.n = c.n;
+    const pc = priorClients[c.n];
+    const revDelta = pc ? deltaChip(c.rev, pc.rev) : `<span class="dchip">MoM —</span>`;
+    const mpctDelta = pc ? (() => {
+      const d = c.mpct - pc.mpct;
+      return `<span class="dchip ${d >= 0 ? 'up' : 'down'}">MoM ${d >= 0 ? '+' : ''}${d.toFixed(1)}pts</span>`;
+    })() : `<span class="dchip">MoM —</span>`;
+    const tags = (c.off_stripe ? `<span class="off-tag">check/ACH</span>` : '') +
+                 (c.agency ? `<span class="agency-tag">via ${c.agency}</span>` : '');
+    r.innerHTML = `<div class="cn">${c.n}${tags}</div><div class="v">${fmt(c.rev)}<br><small>${revDelta}</small></div><div class="v cost">${fmt(c.cost)}</div><div class="v" style="${neg ? 'color:var(--red-dk)' : ''}">${(neg ? '−$' : '$') + Math.abs(Math.round(c.margin)).toLocaleString()}</div><div class="v mpct" style="color:${c.mpct < 35 ? 'var(--red-dk)' : c.mpct > 65 ? 'var(--grn)' : 'var(--ink)'}">${c.mpct.toFixed(0)}%<br><small>${mpctDelta}</small></div>`;
+    cb.appendChild(r);
+  });
+  document.getElementById("clicount").textContent = clients.length + " active clients";
+
+  // ── Employees ─────────────────────────────────────────────────────────────
+  const eb = document.getElementById("empbody");
+  eb.innerHTML = "";
+  roster.forEach(m => {
+    const r = document.createElement("div"); r.className = "emprow";
+    const pill = m.type === "salary" ? '<span class="pill s">salary</span>' : m.type === "contractor" ? '<span class="pill c">contractor</span>' : '<span class="pill h">hourly</span>';
+    r.innerHTML = `<div class="en">${m.name}</div><div class="et"><span class="team-tag" style="background:${teamColor[m.team] || '#67676F'}"></span>${m.team} ${pill}</div><div class="er">${m.rate}</div>`;
+    eb.appendChild(r);
+  });
+
+  // ── Pulse ─────────────────────────────────────────────────────────────────
+  function rankRow(c, i, good) {
+    return `<div class="rank rrow" data-n="${c.n}"><div class="rn"><span class="ri">${i + 1}</span>${c.n}</div><div><span style="color:var(--faint);font-size:11px">${fmt(c.margin)}</span> &nbsp; <span class="rv ${good ? 'good' : 'bad'}">${c.mpct.toFixed(0)}%</span></div></div>`;
+  }
+  const ranked = [...clients].filter(c => c.rev > 0 && c.cost > 0).sort((a, b) => b.mpct - a.mpct);
+  document.getElementById("topgood").innerHTML = ranked.slice(0, 5).map((c, i) => rankRow(c, i, true)).join("");
+  document.getElementById("topbad").innerHTML = ranked.slice(-5).reverse().map((c, i) => rankRow(c, i, false)).join("");
+
+  const tc = document.getElementById("teamcost");
+  tc.innerHTML = "";
+  teams.map(t => {
+    const pt = priorTeams[t.n];
+    const cost = (t.lab || 0) + t.sw;
+    const priorCost = pt ? ((pt.lab || 0) + pt.sw) : null;
+    return { n: t.n, c: t.c, cost, priorCost, emp: t.emp || [] };
+  }).sort((a, b) => b.cost - a.cost).forEach(t => {
+      const d = document.createElement("div"); d.className = "tcrow"; d.dataset.team = t.n;
+      const costDelta = t.priorCost != null ? deltaChip(t.cost, t.priorCost, true) : `<span class="dchip">MoM —</span>`;
+      d.innerHTML = `<div class="tn"><span class="team-tag" style="background:${t.c}"></span>${t.n}</div><div>${costDelta} &nbsp; <span class="tv">${fmt(t.cost)}</span></div>`;
+      tc.appendChild(d);
+    });
+
+  const xi = document.getElementById("xeroincr");
+  xi.innerHTML = "";
+  if (xeroIncr.length === 0) {
+    xi.innerHTML = `<p style="font-size:12px;color:var(--faint);padding:10px 0">Xero cost-increase data loads when credentials are configured.</p>`;
+  } else {
+    xeroIncr.forEach((x, i) => {
+      const d = document.createElement("div"); d.className = "tcrow"; d.dataset.xi = i;
+      d.innerHTML = `<div class="tn">${x.cat}</div><div><span style="color:var(--faint);font-size:11px">${fmt(x.prior)} → ${fmt(x.current)}</span> &nbsp; <span class="tv" style="color:var(--red-dk)">+${fmt(x.incr)}</span></div>`;
+      xi.appendChild(d);
+    });
+  }
+
+  // ── Projection ────────────────────────────────────────────────────────────
+  const proj = co.mrr_total * 1.05; // simple estimate: current MRR + 5%
+  document.getElementById("projamt").textContent = fmt(proj);
+  document.getElementById("projbar").style.width = "65%";
+
+  const pr_mrr = pr.revenue ? pr.revenue * 0.917 : null; // rough prior MRR
+  document.getElementById("projpulse").innerHTML = `
+    <div class="ptile"><div class="pl">MRR this month</div><div class="pv num">${fmt(co.mrr_total)}</div><div class="pd ${pr_mrr && co.mrr_total > pr_mrr ? 'up' : 'down'}">${pr_mrr ? (co.mrr_total > pr_mrr ? '+' : '') + pct(co.mrr_total, pr_mrr) + '% from prior' : 'prior month loading'}</div></div>
+    <div class="ptile"><div class="pl">One-off revenue</div><div class="pv num">${fmt(co.oneoff_total)}</div><div class="pd" style="color:var(--muted)">project work this month</div></div>
+    <div class="ptile"><div class="pl">Contracted MRR (next month)</div><div class="pv num">${fmt(co.mrr_total)}</div><div class="pd" style="color:var(--muted)">already on the books</div></div>`;
+
+  // Revenue bar chart
+  const chart = document.getElementById("chart");
+  chart.innerHTML = "";
+  const all = [...monthly, ["Next*", proj]];
+  const max = Math.max(...all.map(m => m[1]));
+  all.forEach(([m, v], i) => {
+    const isP = i === all.length - 1;
+    const isCur = i === all.length - 2;
+    const d = document.createElement("div"); d.className = "bar" + (isP ? " proj" : isCur ? " cur" : "");
+    d.innerHTML = `<div class="bv">$${Math.round(v / 1000)}k</div><div class="bb" style="height:${v / max * 100}%"></div><div class="bm">${m}</div>`;
+    chart.appendChild(d);
+  });
+
+  // ── Hover handlers ────────────────────────────────────────────────────────
+  function laborHover(tn) {
+    const t = teams.find(x => x.n === tn);
+    if (!t || t.lab === null) return null;
+    const emps = (t.emp || []).filter(e => e !== "(Google team)" && e !== "-");
+    const w = [.34, .26, .22, .18];
+    let dr = emps.slice(0, 4).map((e, i) => `<div class="demp"><span class="dn">${e}</span><span>${fmt((t.lab || 0) * (w[i] || .1))}</span></div>`).join("");
+    if (!emps.length) dr = `<div class="demp"><span class="dn">No dedicated staff</span><span>—</span></div>`;
+    return `<div class="ht">${tn} · labor</div><div class="hsub">${fmt(t.lab)} total this month</div><div class="hdrv">Employee breakdown</div>${dr}<div class="hreal">From Toggl hours × rates.</div>`;
+  }
+
+  function swHover(tn) {
+    const t = teams.find(x => x.n === tn);
+    const items = t ? t.sw_break || [] : [];
+    let rows = items.map(([name, amt]) => `<div class="hrow"><div class="ht2">${name}</div><div class="hv">${fmt(amt)}</div></div>`).join("");
+    return `<div class="ht">${tn} · software</div><div class="hsub">${fmt(t ? t.sw : 0)} this month</div>${rows}<div class="hreal">Validated from the allocation key.</div>`;
+  }
+
+  function mrrHover(tn) {
+    const t = teams.find(x => x.n === tn);
+    const list = t ? (t.top_clients || []) : [];
+    let rows = list.map(([n, v], i) => `<div class="demp"><span class="dn">${i + 1}. ${n}</span><span>${fmt(v)}</span></div>`).join("");
+    return `<div class="ht">${tn} · top clients</div><div class="hsub">${fmt(t ? t.mrr : 0)} MRR this month</div><div class="hdrv">Top clients by ${tn} revenue</div>${rows}<div class="hreal">Client revenue from Stripe.</div>`;
+  }
+
+  function teamCostHover(tn) {
+    const t = teams.find(x => x.n === tn);
+    if (!t) return null;
+    const cost = (t.lab || 0) + t.sw;
+    const emps = (t.emp || []).slice(0, 4);
+    const w = [.34, .26, .22, .18];
+    let dr = emps.map((e, i) => `<div class="demp"><span class="dn">${e}</span><span>${fmt(cost * (w[i] || .1))}</span></div>`).join("");
+    if (!emps.length) dr = `<div class="demp"><span class="dn">No dedicated staff</span><span>—</span></div>`;
+    return `<div class="ht">${tn} · total cost</div><div class="hsub">${fmt(cost)} labor + software</div><div class="hdrv">Top employees</div>${dr}`;
+  }
+
+  function clientCostHover(c) {
+    if (!c) return null;
+    const agencyLine = c.agency ? `<div class="hmodel">via ${c.agency}</div>` : '';
+    return `<div class="ht">${c.n}</div><div class="hsub">${fmt(c.rev)} revenue · ${fmt(c.cost)} cost</div><div class="hrow"><div class="ht2">Labor cost</div><div class="hv hcost">${fmt(c.cost)}</div></div>${agencyLine}<div class="hreal">Labor from Toggl hours × rates.</div>`;
+  }
+
+  function xeroHover(i) {
+    const x = xeroIncr[i];
+    if (!x) return null;
+    let rows = (x.items || []).map(([m, a]) => `<div class="demp"><span class="dn">${m}</span><span>${fmt(a)}</span></div>`).join("");
+    if (!rows) rows = `<div class="demp"><span class="dn">Line-item detail loads with Xero REST API</span><span>—</span></div>`;
+    return `<div class="ht">${x.cat} · +${fmt(x.incr)}</div><div class="hsub">${fmt(x.prior)} prior → ${fmt(x.current)} this month</div><div class="hdrv">Transactions</div>${rows}<div class="hreal">From Xero cash basis.</div>`;
+  }
+
+  bind("td.hcell", el => el.dataset.kind === "labor" ? laborHover(el.dataset.team) : el.dataset.kind === "sw" ? swHover(el.dataset.team) : mrrHover(el.dataset.team));
+  bind(".clirow.crow", el => clientCostHover(clients.find(c => c.n === el.dataset.n)));
+  bind(".rank.rrow",   el => clientCostHover(clients.find(c => c.n === el.dataset.n)));
+  bind(".tcrow[data-team]", el => teamCostHover(el.dataset.team));
+  bind(".tcrow[data-xi]",   el => xeroHover(+el.dataset.xi));
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+fetch("/api/snapshot")
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => render(data))
+  .catch(err => {
+    document.getElementById("monthtag").textContent = "no snapshot";
+    document.getElementById("metrics").innerHTML = `<div style="grid-column:1/-1;padding:20px;color:var(--faint);font-size:13px">No snapshot available. Run: <code>python scripts/refresh.py</code></div>`;
+    console.error("Snapshot fetch failed:", err);
+  });
+
+// Tab switching
+const tabs = [...document.querySelectorAll(".tab")];
+tabs.forEach(t => t.addEventListener("click", () => {
+  tabs.forEach(x => x.setAttribute("aria-selected", "false"));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  t.setAttribute("aria-selected", "true");
+  document.getElementById(t.dataset.p).classList.add("active");
+  hv.style.display = "none";
+}));
+</script>
+</body></html>

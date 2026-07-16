@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""Daily refresh job.
+
+Computes the full margin model for a given month and writes a dated snapshot
+to data/snapshots/YYYY-MM.json.  Run from the project root:
+
+    python scripts/refresh.py                  # current month
+    python scripts/refresh.py --year 2026 --month 5   # specific month
+"""
+
+import argparse
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+# Ensure project root is on path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from atlas.margin.engine import compute_margin
+from atlas.revenue.engine import compute_revenue
+from atlas.software.engine import compute_software
+from atlas.snapshot import build_snapshot, load_snapshot, save_snapshot
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Kaizen Atlas daily refresh")
+    now = datetime.now(timezone.utc)
+    parser.add_argument("--year",  type=int, default=now.year)
+    parser.add_argument("--month", type=int, default=now.month)
+    args = parser.parse_args()
+
+    year, month = args.year, args.month
+    print(f"[atlas refresh] Computing {year}-{month:02d}...")
+
+    # ── Run engines ──────────────────────────────────────────────────────────
+    print("  revenue engine...")
+    revenue = compute_revenue(year, month)
+
+    print("  margin engine (labor + software)...")
+    margin = compute_margin(year, month)
+
+    software = compute_software()
+
+    # ── Prior month snapshot for MoM and history ─────────────────────────────
+    prior_month = month - 1 if month > 1 else 12
+    prior_year  = year if month > 1 else year - 1
+    prior_snapshot = load_snapshot(prior_year, prior_month)
+    if prior_snapshot:
+        print(f"  loaded prior snapshot ({prior_year}-{prior_month:02d})")
+    else:
+        print(f"  no prior snapshot found — MoM deltas will be empty")
+
+    # ── Xero P&L for cost-increase widget ────────────────────────────────────
+    xero_pnl = None
+    try:
+        from atlas.software.xero_pull import _is_available, _refresh_access_token
+        import urllib.request, urllib.parse, json
+
+        if _is_available():
+            print("  fetching Xero P&L for cost-increase widget...")
+            from atlas.config import require
+            import calendar
+            token = _refresh_access_token()
+            tenant_id = require("XERO_TENANT_ID")
+            last_day = calendar.monthrange(year, month)[1]
+            prior_last = calendar.monthrange(prior_year, prior_month)[1]
+            params = urllib.parse.urlencode({
+                "fromDate": f"{year}-{month:02d}-01",
+                "toDate":   f"{year}-{month:02d}-{last_day:02d}",
+                "periods":  1,
+                "timeframe": "MONTH",
+            })
+            url = f"https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?{params}"
+            req = urllib.request.Request(url, headers={
+                "Authorization": f"Bearer {token}",
+                "Xero-tenant-id": tenant_id,
+                "Accept": "application/json",
+            })
+            with urllib.request.urlopen(req) as r:
+                xero_pnl = json.loads(r.read())
+            print("  Xero P&L fetched")
+        else:
+            print("  Xero credentials not set — skipping cost-increase widget")
+    except Exception as exc:
+        print(f"  Xero fetch failed ({exc}) — continuing without")
+
+    # ── Build and save snapshot ───────────────────────────────────────────────
+    generated_at = datetime.now(timezone.utc).isoformat()
+    snapshot = build_snapshot(
+        year=year,
+        month=month,
+        margin_result=margin,
+        revenue_result=revenue,
+        software_result=software,
+        prior_snapshot=prior_snapshot,
+        xero_pnl_current=xero_pnl,
+        generated_at=generated_at,
+    )
+
+    path = save_snapshot(snapshot)
+    print(f"  snapshot saved -> {path}")
+
+    # ── Push to Supabase (kaizen-cc) ─────────────────────────────────────────
+    _push_to_supabase(snapshot, year, month, generated_at)
+
+    # Summary
+    co = snapshot["company"]
+    print(f"\n  Revenue  ${co['revenue']:>10,.0f}")
+    print(f"  Labor    ${snapshot['meta'].get('total_labor', '—')}")
+    print(f"  Net      ${co['net_profit']:>10,.0f}  ({co['margin_pct']}%)")
+    if snapshot["low_tracking_flags"]:
+        print(f"\n  Low-tracking flags: {', '.join(snapshot['low_tracking_flags'])}")
+
+
+def _push_to_supabase(snapshot: dict, year: int, month: int, generated_at: str) -> None:
+    """Push the built snapshot to the kaizen-cc Supabase atlas_snapshots table."""
+    import json, urllib.request, urllib.error
+
+    # Load Supabase credentials from .env
+    try:
+        from atlas.config import get
+        supabase_url    = get("SUPABASE_URL")
+        supabase_key    = get("SUPABASE_SERVICE_KEY")  # service role key
+        supabase_agency = get("SUPABASE_AGENCY_ID")
+    except Exception:
+        supabase_url = supabase_key = supabase_agency = None
+
+    if not supabase_url or not supabase_key or not supabase_agency:
+        print("  Supabase credentials not set — skipping cloud push")
+        print("  Set SUPABASE_URL, SUPABASE_SERVICE_KEY, SUPABASE_AGENCY_ID in .env to enable")
+        return
+
+    payload = json.dumps({
+        "agency_id":    supabase_agency,
+        "year":         year,
+        "month":        month,
+        "snapshot":     snapshot,
+        "generated_at": generated_at,
+    }).encode()
+
+    url = f"{supabase_url}/rest/v1/atlas_snapshots"
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        method="POST",
+        headers={
+            "apikey":         supabase_key,
+            "Authorization":  f"Bearer {supabase_key}",
+            "Content-Type":   "application/json",
+            "Prefer":         "resolution=merge-duplicates",  # upsert
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as r:
+            print(f"  pushed to Supabase (status {r.status})")
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        print(f"  Supabase push failed ({e.code}): {body[:200]}")
+    except Exception as exc:
+        print(f"  Supabase push failed: {exc}")
+
+
+if __name__ == "__main__":
+    main()

@@ -45,8 +45,9 @@ def fetch_invoices(year: int, month: int) -> list[dict]:
 
     invoices = stripe.Invoice.list(
         created={"gte": gte, "lt": lt},
+        status="paid",
         expand=["data.lines"],
         limit=100,
     ).auto_paging_iter()
 
-    return [inv for inv in invoices if inv.get("status") in ("paid", "open", "uncollectible")]
+    return [inv._to_dict_recursive() for inv in invoices]

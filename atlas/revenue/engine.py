@@ -9,12 +9,50 @@ Reimbursement pass-through, normalizes descriptions, and maps to teams.
 from __future__ import annotations
 
 import datetime
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 
 from .classifier import is_pass_through, map_to_team
 from .constants import OFF_STRIPE_RESCUE
 from .stripe_pull import fetch_invoices
+from atlas.margin.constants import AGENCY_CUSTOMERS, WHITE_LABEL_MAP
+
+_WL_LOWER: dict[str, str] = {k.lower(): k for k in WHITE_LABEL_MAP}
+
+# Sub-client name aliases: Stripe description spellings → canonical WHITE_LABEL_MAP key
+_WL_ALIASES: dict[str, str] = {
+    "brooklyn water bagels": "Brooklyn Water Bagel",
+    "raising the bar":       "Raising The Bar",
+    "bascoms chop house":    "Bascom's Chop House",
+    "bascom's chop house":   "Bascom's Chop House",
+}
+
+
+def _parse_sub_client(description: str, wl_lower: dict[str, str]) -> str | None:
+    """Extract a WHITE_LABEL_MAP key from an invoice description like
+    'Ads management for Brooklyn Water Bagel', 'Ads Management, Crown Rally',
+    or 'Ads Management - Tampa Auto Gallery'."""
+    if not description:
+        return None
+    candidates = []
+    # Split on "for" (handles "Basic Website Management for April for Propr Dental")
+    parts = re.split(r"\bfor\b", description, flags=re.IGNORECASE)
+    if len(parts) > 1:
+        candidates.append(parts[-1].strip().rstrip("."))
+    # Comma split: "Ads Management, Crown Rally"
+    if "," in description:
+        candidates.append(description.split(",", 1)[-1].strip())
+    # Dash split: "Ads Management - Tampa Auto Gallery"
+    if " - " in description:
+        candidates.append(description.split(" - ", 1)[-1].strip())
+    for c in candidates:
+        key = c.lower()
+        if key in wl_lower:
+            return wl_lower[key]
+        if key in _WL_ALIASES:
+            return _WL_ALIASES[key]
+    return None
 
 
 @dataclass
@@ -25,6 +63,10 @@ class RevenueResult:
     mrr_by_team: dict[str, float] = field(default_factory=lambda: defaultdict(float))
     # One-off by team in dollars
     oneoff_by_team: dict[str, float] = field(default_factory=lambda: defaultdict(float))
+    # Total revenue by Stripe customer name
+    revenue_by_customer: dict[str, float] = field(default_factory=lambda: defaultdict(float))
+    # Revenue by team by customer — {team: {customer: amount}} — powers MRR hover top-clients
+    revenue_by_team_customer: dict[str, dict] = field(default_factory=lambda: defaultdict(lambda: defaultdict(float)))
     # Lines that didn't match any team (billing-hygiene visibility)
     unmatched_lines: list[dict] = field(default_factory=list)
 
@@ -114,6 +156,16 @@ def compute_revenue(year: int, month: int) -> RevenueResult:
             team = map_to_team(description)
             amount_dollars = amount_cents / 100.0
 
+            # For agency invoices, attribute revenue to the sub-client named
+            # in the invoice description rather than the agency itself.
+            cname = _customer_name(inv)
+            if cname in AGENCY_CUSTOMERS:
+                inv_desc = inv.get("description") or ""
+                sub = _parse_sub_client(inv_desc, _WL_LOWER)
+                rev_key = sub if sub else cname
+            else:
+                rev_key = cname
+
             if _line_type(line) == "subscription":
                 period_ym = _subscription_period_month(line)
                 # Only count MRR whose subscription period belongs to this month.
@@ -121,12 +173,15 @@ def compute_revenue(year: int, month: int) -> RevenueResult:
                 # we must filter by period — not by invoice created date.
                 if period_ym and period_ym == (year, month):
                     result.mrr_by_team[team] += amount_dollars
+                    result.revenue_by_customer[rev_key] += amount_dollars
+                    result.revenue_by_team_customer[team][rev_key] += amount_dollars
             else:
                 # One-off lines: only count if the invoice was created in the
                 # target month. The two-month fetch window means M-1 invoices
                 # are also present, but their one-off lines belong to M-1.
                 if _invoice_created_month(inv) == (year, month):
                     result.oneoff_by_team[team] += amount_dollars
+                    result.revenue_by_customer[rev_key] += amount_dollars
 
             if team == "Other":
                 result.unmatched_lines.append(

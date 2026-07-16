@@ -1,0 +1,62 @@
+name: Monthly Atlas Refresh
+
+on:
+  # Runs at 8am ET on the 2nd of every month
+  schedule:
+    - cron: '0 13 2 * *'
+
+  # Also allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Year (e.g. 2026)'
+        required: false
+        default: ''
+      month:
+        description: 'Month number (e.g. 7 for July)'
+        required: false
+        default: ''
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Compute target month
+        id: target
+        run: |
+          if [ -n "${{ github.event.inputs.year }}" ] && [ -n "${{ github.event.inputs.month }}" ]; then
+            echo "year=${{ github.event.inputs.year }}" >> $GITHUB_OUTPUT
+            echo "month=${{ github.event.inputs.month }}" >> $GITHUB_OUTPUT
+          else
+            # On the 2nd, we want last month's numbers
+            python3 -c "
+          from datetime import date, timedelta
+          today = date.today()
+          first = today.replace(day=1)
+          last_month = first - timedelta(days=1)
+          print(f'year={last_month.year}')
+          print(f'month={last_month.month}')
+          " >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run refresh
+        env:
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          TOGGL_API_TOKEN: ${{ secrets.TOGGL_API_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SUPABASE_AGENCY_ID: ${{ secrets.SUPABASE_AGENCY_ID }}
+        run: |
+          python scripts/refresh.py --year ${{ steps.target.outputs.year }} --month ${{ steps.target.outputs.month }}

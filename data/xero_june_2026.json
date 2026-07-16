@@ -1,0 +1,47 @@
+{
+  "current_pnl": {
+    "period": {"start_date": "2026-06-01", "end_date": "2026-06-30"},
+    "total_income": "151100.01",
+    "total_cost_of_sales": "57954.09",
+    "total_expenses": "48259.44",
+    "gross_profit": "93145.92",
+    "net_profit": "44886.48"
+  },
+  "comparison_pnl": {
+    "period": {"start_date": "2026-05-01", "end_date": "2026-05-31"},
+    "total_income": "139425.00",
+    "total_cost_of_sales": "56185.78",
+    "total_expenses": "50204.96",
+    "gross_profit": "83239.22",
+    "net_profit": "33034.26"
+  },
+  "cost_of_sales_accounts": {
+    "all_accounts": [
+      {"account_name": "Contractors",  "current_balance": "53395.34", "comparison_balance": "51905.99"},
+      {"account_name": "Stripe Fees",  "current_balance": "4377.37",  "comparison_balance": "4229.40"},
+      {"account_name": "Paypal Fees",  "current_balance": "181.38",   "comparison_balance": "50.39"}
+    ]
+  },
+  "expense_accounts": {
+    "all_accounts": [
+      {"account_name": "Wages and Salaries",               "current_balance": "27700.08", "comparison_balance": "28724.12"},
+      {"account_name": "Payroll Tax Expense",              "current_balance": "2169.11",  "comparison_balance": "2348.34"},
+      {"account_name": "Softwares",                        "current_balance": "7233.55",  "comparison_balance": "8057.36"},
+      {"account_name": "Accountable Plan Reimbursements",  "current_balance": "3304.66",  "comparison_balance": "3304.66"},
+      {"account_name": "Health Insurance",                 "current_balance": "3096.42",  "comparison_balance": "2019.74"},
+      {"account_name": "Auto Lease Payments",              "current_balance": "1139.93",  "comparison_balance": "1139.93"},
+      {"account_name": "Consulting & Accounting",          "current_balance": "1000.00",  "comparison_balance": "1000.00"},
+      {"account_name": "Advertising and Marketing",        "current_balance": "798.64",   "comparison_balance": "1019.48"},
+      {"account_name": "Travel",                           "current_balance": "692.78",   "comparison_balance": "9.99"},
+      {"account_name": "Telephone & Internet",             "current_balance": "409.25",   "comparison_balance": "378.37"},
+      {"account_name": "Auto - Insurance",                 "current_balance": "342.74",   "comparison_balance": "342.74"},
+      {"account_name": "Professional Fees",                "current_balance": "181.00",   "comparison_balance": "193.00"},
+      {"account_name": "Insurance",                        "current_balance": "135.27",   "comparison_balance": "104.09"},
+      {"account_name": "Website Expenses",                 "current_balance": "98.00",    "comparison_balance": "98.00"},
+      {"account_name": "Parking & Tolls",                  "current_balance": "89.00",    "comparison_balance": "80.00"},
+      {"account_name": "Meals",                            "current_balance": "0.00",     "comparison_balance": "815.57"},
+      {"account_name": "Bank Service Charges",             "current_balance": "0.00",     "comparison_balance": "400.00"},
+      {"account_name": "Car & Truck",                      "current_balance": "0.00",     "comparison_balance": "169.57"}
+    ]
+  }
+}

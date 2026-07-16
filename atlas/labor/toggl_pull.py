@@ -81,6 +81,36 @@ def fetch_projects() -> dict[int, str]:
     return projects
 
 
+def fetch_projects_with_clients() -> dict[int, dict]:
+    """Return project_id → {name, client_id, client_name} for all active projects.
+
+    client_id / client_name are None for projects with no client assigned.
+    Used by the margin engine to aggregate project hours to the client level.
+    """
+    wid = TOGGL_WORKSPACE_ID
+    # Fetch clients first for id→name lookup
+    clients_raw = _get(f"/api/v9/workspaces/{wid}/clients?status=active")
+    client_names: dict[int, str] = {c["id"]: c["name"] for c in clients_raw}
+
+    projects: dict[int, dict] = {}
+    page = 1
+    while True:
+        data = _get(f"/api/v9/workspaces/{wid}/projects?active=true&page={page}&per_page=200")
+        if not data:
+            break
+        for p in data:
+            cid = p.get("client_id")
+            projects[p["id"]] = {
+                "name": p["name"],
+                "client_id": cid,
+                "client_name": client_names.get(cid) if cid else None,
+            }
+        if len(data) < 200:
+            break
+        page += 1
+    return projects
+
+
 def fetch_user_hours(year: int, month: int) -> list[dict]:
     """Return per-user per-project hour data for the given month.
 

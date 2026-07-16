@@ -30,6 +30,9 @@ SERVICE_TO_TEAM: dict[str, str] = {
     "SEO": "SEO",
     "CRM": "GHL",
     "CRM Maintenance": "GHL",
+    "CRM Build": "GHL",
+    "Content Shoot": "Creative",
+    "Custom Creative": "Creative",
 }
 
 KNOWN_TEAMS: tuple[str, ...] = (
