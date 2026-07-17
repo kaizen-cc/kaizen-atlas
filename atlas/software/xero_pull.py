@@ -56,7 +56,30 @@ def _refresh_access_token() -> str:
 
     req = urllib.request.Request(XERO_TOKEN_URL, data=data, method="POST")
     with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())["access_token"]
+        tokens = json.loads(resp.read())
+
+    # Xero refresh tokens are single-use — persist the new one immediately
+    new_refresh = tokens.get("refresh_token")
+    if new_refresh and new_refresh != refresh_token:
+        _update_env_refresh_token(new_refresh)
+
+    return tokens["access_token"]
+
+
+def _update_env_refresh_token(new_token: str) -> None:
+    """Rewrite XERO_REFRESH_TOKEN in the .env file."""
+    from pathlib import Path
+    env_path = Path(__file__).parent.parent.parent / ".env"
+    if not env_path.exists():
+        return
+    lines = env_path.read_text(encoding="utf-8").splitlines()
+    updated = []
+    for line in lines:
+        if line.startswith("XERO_REFRESH_TOKEN="):
+            updated.append(f"XERO_REFRESH_TOKEN={new_token}")
+        else:
+            updated.append(line)
+    env_path.write_text("\n".join(updated) + "\n", encoding="utf-8")
 
 
 def _get_account_transactions(

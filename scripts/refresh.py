@@ -54,7 +54,7 @@ def main() -> None:
     xero_pnl = None
     try:
         from atlas.software.xero_pull import _is_available, _refresh_access_token
-        import urllib.request, urllib.parse, json
+        import urllib.request, urllib.parse, urllib.error, json
 
         if _is_available():
             print("  fetching Xero P&L for cost-increase widget...")
@@ -67,8 +67,6 @@ def main() -> None:
             params = urllib.parse.urlencode({
                 "fromDate": f"{year}-{month:02d}-01",
                 "toDate":   f"{year}-{month:02d}-{last_day:02d}",
-                "periods":  1,
-                "timeframe": "MONTH",
             })
             url = f"https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?{params}"
             req = urllib.request.Request(url, headers={
@@ -81,6 +79,9 @@ def main() -> None:
             print("  Xero P&L fetched")
         else:
             print("  Xero credentials not set — skipping cost-increase widget")
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode()
+        print(f"  Xero fetch failed ({exc}) — body: {body[:500]}")
     except Exception as exc:
         print(f"  Xero fetch failed ({exc}) — continuing without")
 
@@ -138,7 +139,7 @@ def _push_to_supabase(snapshot: dict, year: int, month: int, generated_at: str) 
         "generated_at": generated_at,
     }).encode()
 
-    url = f"{supabase_url}/rest/v1/atlas_snapshots"
+    url = f"{supabase_url}/rest/v1/atlas_snapshots?on_conflict=agency_id,year,month"
     req = urllib.request.Request(
         url,
         data=payload,
