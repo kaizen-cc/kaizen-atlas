@@ -253,54 +253,62 @@ def build_snapshot(
 
 
 def _build_xero_incr(current_pnl: dict | None, prior_pnl: dict | None) -> list[dict]:
-    """Build cost-increase list from Xero P&L comparison data."""
-    if not current_pnl:
+    """Build cost-increase list from raw Xero REST ProfitAndLoss responses."""
+    if not current_pnl or not prior_pnl:
         return []
 
     EXCLUDE = frozenset([
         "Stripe Income", "Services", "Owners Draw",
         "AMEX", "BofA", "Stripe USD", "PayPal", "Gusto Clearing",
+        "Total Revenue", "Total Cost of Sales", "Total Operating Expenses", "Net Income",
     ])
 
-    # Combine cost_of_sales + expense accounts
-    def _accounts(pnl_block: dict) -> dict[str, float]:
-        out = {}
-        for section in ("cost_of_sales_accounts", "expense_accounts"):
-            for acct in pnl_block.get(section, {}).get("all_accounts", []):
-                name = acct.get("account_name", "")
-                if name in EXCLUDE:
+    COST_SECTIONS = frozenset(["less cost of sales", "operating expenses", "cost of sales"])
+
+    def _extract_accounts(pnl: dict) -> dict[str, float]:
+        """Extract account name → amount from raw Xero Rows for cost sections only."""
+        out: dict[str, float] = {}
+        try:
+            rows = pnl["Reports"][0]["Rows"]
+        except (KeyError, IndexError):
+            return out
+
+        in_cost_section = False
+        for section in rows:
+            title = section.get("Title", "").lower()
+            in_cost_section = any(cs in title for cs in COST_SECTIONS)
+            if not in_cost_section:
+                continue
+            for row in section.get("Rows", []):
+                if row.get("RowType") in ("SummaryRow",):
+                    continue
+                cells = row.get("Cells", [])
+                if len(cells) < 2:
+                    continue
+                name = (cells[0].get("Value") or "").strip()
+                if not name or name in EXCLUDE:
                     continue
                 try:
-                    out[name] = float(acct.get("current_balance", 0))
-                except (TypeError, ValueError):
+                    val = float(str(cells[1].get("Value") or "0").replace(",", ""))
+                    if val != 0:
+                        out[name] = val
+                except ValueError:
                     pass
         return out
 
-    cur = _accounts(current_pnl)
-
-    # Prior: use comparison data embedded in the P&L response
-    prior: dict[str, float] = {}
-    for section in ("cost_of_sales_accounts", "expense_accounts"):
-        for acct in current_pnl.get(section, {}).get("all_accounts", []):
-            name = acct.get("account_name", "")
-            if name in EXCLUDE:
-                continue
-            try:
-                prior[name] = float(acct.get("comparison_balance") or 0)
-            except (TypeError, ValueError):
-                pass
+    cur = _extract_accounts(current_pnl)
+    prior = _extract_accounts(prior_pnl)
 
     increases = []
     for name, cur_amt in cur.items():
         pri_amt = prior.get(name, 0.0)
         incr = cur_amt - pri_amt
-        if incr > 0:
+        if incr > 50:  # ignore noise below $50
             increases.append({
                 "cat": name,
                 "prior": round(pri_amt, 2),
                 "current": round(cur_amt, 2),
                 "incr": round(incr, 2),
-                "items": [],  # line-item detail needs Xero REST API
             })
 
     increases.sort(key=lambda x: -x["incr"])
