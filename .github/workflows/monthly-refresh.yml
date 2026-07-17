@@ -1,9 +1,9 @@
 name: Monthly Atlas Refresh
 
 on:
-  # Runs at 8am ET on the 2nd of every month
+  # Runs at 8am ET every morning
   schedule:
-    - cron: '0 13 2 * *'
+    - cron: '0 13 * * *'
 
   # Also allows manual trigger from GitHub Actions tab
   workflow_dispatch:
@@ -40,14 +40,12 @@ jobs:
             echo "year=${{ github.event.inputs.year }}" >> $GITHUB_OUTPUT
             echo "month=${{ github.event.inputs.month }}" >> $GITHUB_OUTPUT
           else
-            # On the 2nd, we want last month's numbers
+            # Default: current month for daily pacing
             python3 -c "
-          from datetime import date, timedelta
+          from datetime import date
           today = date.today()
-          first = today.replace(day=1)
-          last_month = first - timedelta(days=1)
-          print(f'year={last_month.year}')
-          print(f'month={last_month.month}')
+          print(f'year={today.year}')
+          print(f'month={today.month}')
           " >> $GITHUB_OUTPUT
           fi
 
@@ -58,5 +56,9 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           SUPABASE_AGENCY_ID: ${{ secrets.SUPABASE_AGENCY_ID }}
+          XERO_CLIENT_ID: ${{ secrets.XERO_CLIENT_ID }}
+          XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
+          XERO_TENANT_ID: ${{ secrets.XERO_TENANT_ID }}
+          XERO_REFRESH_TOKEN: ${{ secrets.XERO_REFRESH_TOKEN }}
         run: |
           python scripts/refresh.py --year ${{ steps.target.outputs.year }} --month ${{ steps.target.outputs.month }}
