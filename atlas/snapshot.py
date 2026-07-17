@@ -81,6 +81,7 @@ def build_snapshot(
     prior_snapshot: dict | None = None,
     xero_pnl_current: dict | None = None,
     xero_pnl_prior: dict | None = None,
+    xero_actuals: dict | None = None,
     generated_at: str = "",
 ) -> dict:
     """Assemble the full dashboard snapshot from engine outputs."""
@@ -97,21 +98,23 @@ def build_snapshot(
     mrr_pct = round(mrr_total / total_rev * 100, 1) if total_rev else 0.0
     oneoff_pct = round(100 - mrr_pct, 1)
 
-    # Xero cash total — use xero_pnl if available, else fall back to total_rev
-    xero_total = total_rev
-    if xero_pnl_current:
-        try:
-            xero_total = float(xero_pnl_current.get("current_pnl", {}).get("total_income", total_rev))
-        except (TypeError, ValueError):
-            pass
+    # ── Override with Xero actuals when available ─────────────────────────────
+    xero_revenue = xero_actuals.get("total_income") if xero_actuals else None
+    xero_net     = xero_actuals.get("net_profit")   if xero_actuals else None
+
+    actual_revenue = xero_revenue if xero_revenue else total_rev
+    actual_profit  = xero_net     if xero_net is not None else co.net_profit
+    actual_margin  = round(actual_profit / actual_revenue * 100, 1) if actual_revenue else co.margin_pct
+
+    xero_total = actual_revenue
     residual = round(xero_total - revenue_result.mrr_total - revenue_result.oneoff_total, 2)
 
     company = {
-        "revenue": round(total_rev, 2),
+        "revenue": round(actual_revenue, 2),
         "mrr_total": round(mrr_total, 2),
         "oneoff_total": round(oneoff_total, 2),
-        "net_profit": co.net_profit,
-        "margin_pct": co.margin_pct,
+        "net_profit": round(actual_profit, 2),
+        "margin_pct": actual_margin,
         "mrr_pct": mrr_pct,
         "oneoff_pct": oneoff_pct,
         "stripe_recognized": round(revenue_result.mrr_total + revenue_result.oneoff_total, 2),

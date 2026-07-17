@@ -50,8 +50,9 @@ def main() -> None:
     else:
         print(f"  no prior snapshot found — MoM deltas will be empty")
 
-    # ── Xero P&L for cost-increase widget ────────────────────────────────────
+    # ── Xero P&L — source of truth for revenue, costs, and net profit ────────
     xero_pnl = None
+    xero_actuals = None
     try:
         from atlas.software.xero_pull import _is_available, _refresh_access_token
         import urllib.request, urllib.parse, urllib.error, json
@@ -63,7 +64,6 @@ def main() -> None:
             token = _refresh_access_token()
             tenant_id = require("XERO_TENANT_ID")
             last_day = calendar.monthrange(year, month)[1]
-            prior_last = calendar.monthrange(prior_year, prior_month)[1]
             params = urllib.parse.urlencode({
                 "fromDate": f"{year}-{month:02d}-01",
                 "toDate":   f"{year}-{month:02d}-{last_day:02d}",
@@ -76,7 +76,8 @@ def main() -> None:
             })
             with urllib.request.urlopen(req) as r:
                 xero_pnl = json.loads(r.read())
-            print("  Xero P&L fetched")
+            xero_actuals = _parse_xero_pnl(xero_pnl)
+            print(f"  Xero P&L fetched — income={xero_actuals.get('total_income')}, net={xero_actuals.get('net_profit')}")
         else:
             print("  Xero credentials not set — skipping cost-increase widget")
     except urllib.error.HTTPError as exc:
@@ -95,6 +96,7 @@ def main() -> None:
         software_result=software,
         prior_snapshot=prior_snapshot,
         xero_pnl_current=xero_pnl,
+        xero_actuals=xero_actuals,
         generated_at=generated_at,
     )
 
@@ -159,6 +161,46 @@ def _push_to_supabase(snapshot: dict, year: int, month: int, generated_at: str) 
         print(f"  Supabase push failed ({e.code}): {body[:200]}")
     except Exception as exc:
         print(f"  Supabase push failed: {exc}")
+
+
+def _parse_xero_pnl(raw: dict) -> dict:
+    """Extract total_income and net_profit from a raw Xero ProfitAndLoss response."""
+    result = {"total_income": None, "total_costs": None, "net_profit": None}
+    try:
+        rows = raw["Reports"][0]["Rows"]
+    except (KeyError, IndexError):
+        return result
+
+    def _val(cells, idx=1):
+        try:
+            v = str(cells[idx].get("Value", "") or "").replace(",", "").strip()
+            return float(v) if v else None
+        except (ValueError, IndexError):
+            return None
+
+    def _scan_all_rows(section_rows):
+        """Yield (label, value) for every row with cells, recursively."""
+        for row in section_rows:
+            cells = row.get("Cells", [])
+            label = cells[0].get("Value", "") if cells else ""
+            if label:
+                yield label, _val(cells)
+            for sub in row.get("Rows", []):
+                yield from _scan_all_rows([sub])
+
+    for label, val in _scan_all_rows(rows):
+        if val is None:
+            continue
+        lc = label.lower()
+        if "total revenue" in lc or "total income" in lc:
+            result["total_income"] = val
+        elif lc in ("net income", "net loss", "net profit"):
+            result["net_profit"] = val if "loss" not in lc else -val
+
+    if result["total_income"] and result["net_profit"] is not None:
+        result["total_costs"] = round(result["total_income"] - result["net_profit"], 2)
+
+    return result
 
 
 if __name__ == "__main__":
