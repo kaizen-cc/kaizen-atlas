@@ -1,4 +1,4 @@
-name: Monthly Atlas Refresh
+name: Atlas Daily Refresh
 
 on:
   # Runs at 8am ET every morning
