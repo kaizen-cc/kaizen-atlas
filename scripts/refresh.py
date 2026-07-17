@@ -64,23 +64,34 @@ def main() -> None:
             token = _refresh_access_token()
             tenant_id = require("XERO_TENANT_ID")
 
-            # Single call with periods=1 returns current + prior comparison columns
             last_day = calendar.monthrange(year, month)[1]
-            params = urllib.parse.urlencode({
-                "fromDate":  f"{year}-{month:02d}-01",
-                "toDate":    f"{year}-{month:02d}-{last_day:02d}",
-                "periods":   "1",
-                "timeframe": "MONTH",
-            })
-            print("  fetching Xero P&L (current + prior comparison)...")
-            url = f"https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?{params}"
-            req = urllib.request.Request(url, headers={
-                "Authorization": f"Bearer {token}",
-                "Xero-tenant-id": tenant_id,
-                "Accept": "application/json",
-            })
-            with urllib.request.urlopen(req) as r:
-                xero_pnl = json.loads(r.read())
+            base_dates = {
+                "fromDate": f"{year}-{month:02d}-01",
+                "toDate":   f"{year}-{month:02d}-{last_day:02d}",
+            }
+
+            def _fetch_pnl(extra_params=None):
+                p = dict(base_dates)
+                if extra_params:
+                    p.update(extra_params)
+                u = f"https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?{urllib.parse.urlencode(p)}"
+                r = urllib.request.Request(u, headers={
+                    "Authorization": f"Bearer {token}",
+                    "Xero-tenant-id": tenant_id,
+                    "Accept": "application/json",
+                })
+                with urllib.request.urlopen(r) as resp:
+                    return json.loads(resp.read())
+
+            # Try with comparison period; fall back to single-period if 400
+            try:
+                print("  fetching Xero P&L (current + prior comparison)...")
+                xero_pnl = _fetch_pnl({"periods": "1", "timeframe": "MONTH"})
+                print("  Xero P&L with comparison fetched")
+            except urllib.error.HTTPError as e400:
+                print(f"  comparison P&L failed ({e400.code}) — falling back to single-period")
+                xero_pnl = _fetch_pnl()
+
             xero_actuals = _parse_xero_pnl(xero_pnl)
             print(f"  Xero P&L fetched — income={xero_actuals.get('total_income')}, net={xero_actuals.get('net_profit')}")
         else:
