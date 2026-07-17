@@ -252,58 +252,66 @@ def build_snapshot(
     }
 
 
-def _build_xero_incr(current_pnl: dict | None, prior_pnl: dict | None) -> list[dict]:
-    """Build cost-increase list from raw Xero REST ProfitAndLoss responses."""
-    if not current_pnl or not prior_pnl:
+def _build_xero_incr(current_pnl: dict | None, prior_pnl: dict | None = None) -> list[dict]:
+    """Build cost-increase list from a Xero ProfitAndLoss response with periods=1.
+
+    When fetched with periods=1&timeframe=MONTH, each Row has 3 Cells:
+      Cells[0] = account name, Cells[1] = current period, Cells[2] = prior period.
+    We scan ALL non-revenue sections and compare current vs prior.
+    """
+    if not current_pnl:
         return []
 
-    EXCLUDE = frozenset([
+    SKIP_NAMES = frozenset([
         "Stripe Income", "Services", "Owners Draw",
         "AMEX", "BofA", "Stripe USD", "PayPal", "Gusto Clearing",
-        "Total Revenue", "Total Cost of Sales", "Total Operating Expenses", "Net Income",
     ])
+    # Skip summary/total rows by name prefix
+    SUMMARY_PREFIXES = ("Total ", "Net ", "Gross ")
+    # Skip revenue/income sections entirely
+    INCOME_KEYWORDS = ("revenue", "income", "other income")
 
-    COST_SECTIONS = frozenset(["less cost of sales", "operating expenses", "cost of sales"])
-
-    def _extract_accounts(pnl: dict) -> dict[str, float]:
-        """Extract account name → amount from raw Xero Rows for cost sections only."""
-        out: dict[str, float] = {}
+    def _val(cell) -> float:
         try:
-            rows = pnl["Reports"][0]["Rows"]
-        except (KeyError, IndexError):
-            return out
+            return float(str(cell.get("Value") or "0").replace(",", ""))
+        except (ValueError, TypeError):
+            return 0.0
 
-        in_cost_section = False
-        for section in rows:
-            title = section.get("Title", "").lower()
-            in_cost_section = any(cs in title for cs in COST_SECTIONS)
-            if not in_cost_section:
+    cur: dict[str, float] = {}
+    pri: dict[str, float] = {}
+
+    try:
+        rows = current_pnl["Reports"][0]["Rows"]
+    except (KeyError, IndexError):
+        return []
+
+    for section in rows:
+        title = section.get("Title", "").lower()
+        # Skip revenue/income sections
+        if any(kw in title for kw in INCOME_KEYWORDS):
+            continue
+        for row in section.get("Rows", []):
+            if row.get("RowType") in ("SummaryRow", "Header"):
                 continue
-            for row in section.get("Rows", []):
-                if row.get("RowType") in ("SummaryRow",):
-                    continue
-                cells = row.get("Cells", [])
-                if len(cells) < 2:
-                    continue
-                name = (cells[0].get("Value") or "").strip()
-                if not name or name in EXCLUDE:
-                    continue
-                try:
-                    val = float(str(cells[1].get("Value") or "0").replace(",", ""))
-                    if val != 0:
-                        out[name] = val
-                except ValueError:
-                    pass
-        return out
-
-    cur = _extract_accounts(current_pnl)
-    prior = _extract_accounts(prior_pnl)
+            cells = row.get("Cells", [])
+            if len(cells) < 2:
+                continue
+            name = (cells[0].get("Value") or "").strip()
+            if not name or name in SKIP_NAMES:
+                continue
+            if any(name.startswith(p) for p in SUMMARY_PREFIXES):
+                continue
+            cur_amt = _val(cells[1]) if len(cells) > 1 else 0.0
+            pri_amt = _val(cells[2]) if len(cells) > 2 else 0.0
+            if cur_amt != 0 or pri_amt != 0:
+                cur[name] = cur_amt
+                pri[name] = pri_amt
 
     increases = []
     for name, cur_amt in cur.items():
-        pri_amt = prior.get(name, 0.0)
+        pri_amt = pri.get(name, 0.0)
         incr = cur_amt - pri_amt
-        if incr > 50:  # ignore noise below $50
+        if incr > 50:
             increases.append({
                 "cat": name,
                 "prior": round(pri_amt, 2),

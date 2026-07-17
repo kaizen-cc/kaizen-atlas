@@ -64,32 +64,25 @@ def main() -> None:
             token = _refresh_access_token()
             tenant_id = require("XERO_TENANT_ID")
 
-            def _xero_pnl(yr, mo):
-                last_day = calendar.monthrange(yr, mo)[1]
-                params = urllib.parse.urlencode({
-                    "fromDate": f"{yr}-{mo:02d}-01",
-                    "toDate":   f"{yr}-{mo:02d}-{last_day:02d}",
-                })
-                url = f"https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?{params}"
-                req = urllib.request.Request(url, headers={
-                    "Authorization": f"Bearer {token}",
-                    "Xero-tenant-id": tenant_id,
-                    "Accept": "application/json",
-                })
-                with urllib.request.urlopen(req) as r:
-                    return json.loads(r.read())
-
-            print("  fetching Xero P&L (current month)...")
-            xero_pnl = _xero_pnl(year, month)
+            # Single call with periods=1 returns current + prior comparison columns
+            last_day = calendar.monthrange(year, month)[1]
+            params = urllib.parse.urlencode({
+                "fromDate":  f"{year}-{month:02d}-01",
+                "toDate":    f"{year}-{month:02d}-{last_day:02d}",
+                "periods":   "1",
+                "timeframe": "MONTH",
+            })
+            print("  fetching Xero P&L (current + prior comparison)...")
+            url = f"https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?{params}"
+            req = urllib.request.Request(url, headers={
+                "Authorization": f"Bearer {token}",
+                "Xero-tenant-id": tenant_id,
+                "Accept": "application/json",
+            })
+            with urllib.request.urlopen(req) as r:
+                xero_pnl = json.loads(r.read())
             xero_actuals = _parse_xero_pnl(xero_pnl)
             print(f"  Xero P&L fetched — income={xero_actuals.get('total_income')}, net={xero_actuals.get('net_profit')}")
-
-            print("  fetching Xero P&L (prior month for cost comparison)...")
-            try:
-                xero_pnl_prior = _xero_pnl(prior_year, prior_month)
-                print("  Xero prior P&L fetched")
-            except Exception as exc2:
-                print(f"  Xero prior P&L failed ({exc2}) — cost increases will be skipped")
         else:
             print("  Xero credentials not set — skipping Xero pull")
     except urllib.error.HTTPError as exc:
@@ -108,7 +101,6 @@ def main() -> None:
         software_result=software,
         prior_snapshot=prior_snapshot,
         xero_pnl_current=xero_pnl,
-        xero_pnl_prior=xero_pnl_prior,
         xero_actuals=xero_actuals,
         generated_at=generated_at,
     )
